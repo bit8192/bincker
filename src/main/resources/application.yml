@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: bincker
+  datasource:
+    url: jdbc:sqlite://database.db
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
