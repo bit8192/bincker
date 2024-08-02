@@ -11,6 +11,8 @@ import lombok.Setter;
 public class Blog extends BaseEntity {
     private String title;
 
+    private String filePath;
+
     private Integer sort;
 
     private Integer hits;
