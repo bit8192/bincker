@@ -2,8 +2,11 @@ spring:
   application:
     name: bincker
   datasource:
-    url: jdbc:sqlite://database.db
+    url: jdbc:sqlite:database.db
 mybatis-plus:
   global-config:
     db-config:
       logic-delete-field: deleted
+logging:
+  level:
+    cn.bincker: debug

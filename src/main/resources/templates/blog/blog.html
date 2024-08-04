@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>博客</title>
-    <th:block th:insert="~{common/basic :: css}"/>
+    <title th:text="${blog.getTitle()}">Blog Title</title>
+    <th:block th:insert="~{common/basic :: css}" />
 </head>
 <body>
 <th:block th:insert="~{common/basic :: nav}"/>
 <main class="container-xxl">
-    <div class="text-md-center">
-        <p class="text-secondary-emphasis fs-1 p-4">这人懒得一批，会写博客？</p>
-    </div>
+<p th:utext="*{content}">
+    content
+</p>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
-<th:block th:insert="~{common/basic :: js}"/>
+<th:block th:insert="~{common/basic :: js}" />
+<script th:inline="javascript">
+    (function(){
+        $.post(/*[[${'/blog/hit/' + blog.getId()}]]*/ "/blog/hit/id")
+    })()
+</script>
 </body>
 </html>
