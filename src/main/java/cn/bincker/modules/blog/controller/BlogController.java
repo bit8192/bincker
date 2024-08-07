@@ -4,12 +4,15 @@ import cn.bincker.modules.blog.entity.Blog;
 import cn.bincker.modules.blog.service.BlogService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("blog")
+@Slf4j
 public class BlogController {
     private final BlogService blogService;
 
@@ -24,7 +27,7 @@ public class BlogController {
         return "blog/index";
     }
 
-    @GetMapping("/**")
+    @GetMapping(path = "/**/{path:^[\\w?%&_=]+}.md", produces = MediaType.TEXT_HTML_VALUE)
     public String blog(HttpServletRequest httpRequest, Model model) {
         var path = httpRequest.getRequestURI().replaceAll("^/blog/", "");
         var blog = blogService.getByPath(path);
@@ -33,6 +36,13 @@ public class BlogController {
         model.addAttribute("content", blogService.renderBlogContent(blog.get()));
         return "blog/blog";
     }
+
+//    @GetMapping(value = "/**", produces = MediaType.ALL_VALUE)
+//    @ResponseBody
+//    public void resources(HttpServletRequest request, HttpServletResponse response) {
+//        log.debug("handle resource");
+////        resourceHandlerMapping.getHandler(request)
+//    }
 
     @PostMapping("/hit/{id}")
     @ResponseBody

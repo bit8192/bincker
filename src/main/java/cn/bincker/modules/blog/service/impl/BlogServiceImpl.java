@@ -36,7 +36,6 @@ import static java.nio.file.StandardWatchEventKinds.*;
 @Service
 @Slf4j
 public class BlogServiceImpl implements BlogService, Runnable, ApplicationListener<ApplicationContextEvent> {
-    private static final Path BLOG_DIR = Path.of("blog");
     private final BlogMapper blogMapper;
     private final WatchService watchService;
     private final Parser parser;
