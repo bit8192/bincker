@@ -1,23 +1,31 @@
 package cn.bincker.modules.blog.controller;
 
 import cn.bincker.modules.blog.entity.Blog;
+import cn.bincker.modules.blog.handler.BlogResourceRequestHandler;
 import cn.bincker.modules.blog.service.BlogService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.HandlerMapping;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping("blog")
 @Slf4j
 public class BlogController {
     private final BlogService blogService;
+    private final BlogResourceRequestHandler resourceHandler;
 
-    public BlogController(BlogService blogService) {
+    public BlogController(BlogService blogService, BlogResourceRequestHandler resourceHandler) {
         this.blogService = blogService;
+        this.resourceHandler = resourceHandler;
     }
 
     @GetMapping
@@ -27,22 +35,19 @@ public class BlogController {
         return "blog/index";
     }
 
-    @GetMapping(path = "/**/{path:^[\\w?%&_=]+}.md", produces = MediaType.TEXT_HTML_VALUE)
-    public String blog(HttpServletRequest httpRequest, Model model) {
-        var path = httpRequest.getRequestURI().replaceAll("^/blog/", "");
+    @GetMapping(path = "/**", produces = MediaType.TEXT_HTML_VALUE)
+    public String blog(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+        var path = request.getRequestURI().replaceAll("^/blog/", "");
         var blog = blogService.getByPath(path);
-        if (blog.isEmpty()) return "404";
+        if (blog.isEmpty()) {
+            request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, ((String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replaceAll("^/blog", ""));
+            resourceHandler.handleRequest(request, response);
+            return null;
+        }
         model.addAttribute("blog", blog.get());
         model.addAttribute("content", blogService.renderBlogContent(blog.get()));
         return "blog/blog";
     }
-
-//    @GetMapping(value = "/**", produces = MediaType.ALL_VALUE)
-//    @ResponseBody
-//    public void resources(HttpServletRequest request, HttpServletResponse response) {
-//        log.debug("handle resource");
-////        resourceHandlerMapping.getHandler(request)
-//    }
 
     @PostMapping("/hit/{id}")
     @ResponseBody

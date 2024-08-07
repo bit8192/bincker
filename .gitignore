@@ -36,4 +36,4 @@ out/
 .vscode/
 
 database.db
-blog
+/blog/
