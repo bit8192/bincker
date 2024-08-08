@@ -26,6 +26,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.*;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
@@ -64,14 +66,27 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
     @Override
     public void run() {
         WatchKey key;
-        int eventCount = 0;
+        var updateBlogSet = new HashSet<Path>();
+        var deleteBlogSet = new HashSet<Path>();
         while (running) {
             try {
                 key = watchService.poll(1, TimeUnit.SECONDS);
                 if (key == null) {
-                    if (eventCount > 0) {
-                        log.debug("start sync.");
-                        eventCount = 0;
+                    if (!updateBlogSet.isEmpty()) {
+                        updateBlogSet.forEach(p->{
+                            try{
+                                updateBlogFile(p.toFile());
+                            }catch(Exception e){
+                                log.error("update blog file error.", e);
+                            }
+                        });
+                        updateBlogSet.clear();
+                    }
+                    if (!deleteBlogSet.isEmpty()) {
+                        deleteBlogSet.forEach(p-> {
+                            blogMapper.delete(Wrappers.<Blog>lambdaQuery().eq(Blog::getFilePath, p.toString()));
+                        });
+                        deleteBlogSet.clear();
                     }
                     continue;
                 }
@@ -81,7 +96,6 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
             for (WatchEvent<?> event : key.pollEvents()) {
                 var kind = event.kind();
                 if (kind == OVERFLOW) continue;
-                eventCount++;
                 var filePath = (Path) event.context();
                 var fullPath = BLOG_DIR.resolve(filePath);
                 if (kind == ENTRY_CREATE) {
@@ -91,6 +105,15 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
                         } catch (IOException e) {
                             log.error("register watch path fail: {}", fullPath, e);
                         }
+                    }
+                }else if(kind == ENTRY_MODIFY){
+                    if (isBlogFile(fullPath.toFile())){
+                        updateBlogSet.add(fullPath);
+                    }
+                }else if(kind == ENTRY_DELETE){
+                    //TODO 绝对路径
+                    if (isBlogFile(fullPath.toFile())){
+                        deleteBlogSet.add(fullPath);
                     }
                 }
                 log.debug("event: {}, fullPath: {}", kind.name(), fullPath);
@@ -117,36 +140,45 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
 
     @Override
     public void sync() {
-        loopBlogFiles(file -> {
-            if (!isBlogFile(file)) return;
-            String title = null;
-            try(var reader = new InputStreamReader(new FileInputStream(file))) {
-                var document = parser.parseReader(reader);
-                for (Node child : document.getChildren()) {
-                    if (child instanceof Heading && ((Heading) child).getLevel() == 1){
-                        title = ((Heading) child).getText().unescape();
-                        break;
-                    }
+        loopBlogFiles(this::updateBlogFile);
+    }
+
+    private void updateBlogFile(File file) {
+        if (!isBlogFile(file)) return;
+        String title = null;
+        try(var reader = new InputStreamReader(new FileInputStream(file))) {
+            var document = parser.parseReader(reader);
+            for (Node child : document.getChildren()) {
+                if (child instanceof Heading && ((Heading) child).getLevel() == 1){
+                    title = ((Heading) child).getText().unescape();
+                    break;
                 }
-            } catch (IOException e) {
-                log.warn("parse blog file fail: {}", file, e);
             }
-            if (title == null){
-                title = getFilenameWithoutSuffix(file.getName()).equalsIgnoreCase("index") ? file.getParentFile().getName() : file.getName();
-            }
-            var filePath = BLOG_DIR.relativize(file.toPath());
-            if (!blogMapper.exists(Wrappers.<Blog>lambdaQuery().eq(Blog::getFilePath, filePath))){
-                var blog = new Blog();
-                blog.setTitle(title);
-                blog.setHits(0);
-                blog.setShares(0);
-                blog.setFilePath(filePath.toString());
-                blogMapper.insert(blog);
-            }
-//                else {
-//                    修改
-//                }
-        });
+        } catch (IOException e) {
+            log.warn("parse blog file fail: {}", file, e);
+        }
+        if (title == null){
+            title = getFilenameWithoutSuffix(file.getName()).equalsIgnoreCase("index") ? file.getParentFile().getName() : file.getName();
+        }
+        var filePath = BLOG_DIR.relativize(file.toPath());
+        var blog = blogMapper.selectOne(Wrappers.<Blog>lambdaQuery().eq(Blog::getFilePath, filePath));
+        if (blog == null){
+            blog = new Blog();
+            blog.setTitle(title);
+            blog.setHits(0);
+            blog.setShares(0);
+            blog.setFilePath(filePath.toString());
+            blog.setFileLastModified(new Date(file.lastModified()));
+            blog.setDeleted(false);
+            blogMapper.insert(blog);
+        } else {
+            blogMapper.update(null,
+                    Wrappers.<Blog>lambdaUpdate()
+                            .set(Blog::getTitle, title)
+                            .set(Blog::getFileLastModified, new Date(file.lastModified()))
+                            .set(Blog::getDeleted, false)
+                            .eq(Blog::getId, blog.getId()));
+        }
     }
 
     private static boolean isBlogFile(File file) {

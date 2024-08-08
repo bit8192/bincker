@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @TableName("blog")
 @Getter
 @Setter
@@ -18,4 +20,6 @@ public class Blog extends BaseEntity {
     private Integer hits;
 
     private Integer shares;
+
+    private Date fileLastModified;
 }
