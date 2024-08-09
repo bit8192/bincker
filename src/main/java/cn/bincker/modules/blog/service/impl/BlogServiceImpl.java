@@ -26,12 +26,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Stack;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -43,6 +40,7 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
     private boolean running = true;
+    private final Map<WatchKey, Path> watchPaths = new HashMap<>();
 
     public BlogServiceImpl(BlogMapper blogMapper, ThreadPoolTaskExecutor taskExecutor) throws IOException {
         this.blogMapper = blogMapper;
@@ -52,12 +50,15 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
 
         if(!BLOG_DIR.toFile().exists() && !BLOG_DIR.toFile().mkdirs()) throw new SystemException("create blog dir failed");
         watchService = FileSystems.getDefault().newWatchService();
-        loopBlogFiles(file -> {
-            if (!file.isDirectory()) return;
-            try {
-                file.toPath().register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        Files.walkFileTree(BLOG_DIR, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                try {
+                    watchPaths.put(dir.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), dir);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return FileVisitResult.CONTINUE;
             }
         });
         taskExecutor.execute(this);
@@ -83,9 +84,7 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
                         updateBlogSet.clear();
                     }
                     if (!deleteBlogSet.isEmpty()) {
-                        deleteBlogSet.forEach(p-> {
-                            blogMapper.delete(Wrappers.<Blog>lambdaQuery().eq(Blog::getFilePath, p.toString()));
-                        });
+                        deleteBlogSet.forEach(p-> blogMapper.delete(Wrappers.<Blog>lambdaQuery().eq(Blog::getFilePath, BLOG_DIR.relativize(p))));
                         deleteBlogSet.clear();
                     }
                     continue;
@@ -93,32 +92,34 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
             } catch (InterruptedException e) {
                 throw new SystemException("watch service error");
             }
-            for (WatchEvent<?> event : key.pollEvents()) {
+            var watchPath = watchPaths.get(key);
+            log.debug("watchPath:{}", watchPath);
+            if (watchPath != null) for (WatchEvent<?> event : key.pollEvents()) {
                 var kind = event.kind();
                 if (kind == OVERFLOW) continue;
                 var filePath = (Path) event.context();
-                //TODO 路径不正确
-                var fullPath = BLOG_DIR.resolve(filePath);
+                var fullPath = watchPath.resolve(filePath);
                 if (kind == ENTRY_CREATE) {
                     if(fullPath.toFile().isDirectory()){
                         try {
-                            fullPath.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+                            watchPaths.put(fullPath.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), fullPath);
                         } catch (IOException e) {
                             log.error("register watch path fail: {}", fullPath, e);
                         }
                     }
                 }else if(kind == ENTRY_MODIFY){
                     if (isBlogFile(fullPath.toFile())){
-                        updateBlogSet.add(filePath);
+                        updateBlogSet.add(fullPath);
                     }
                 }else if(kind == ENTRY_DELETE){
                     if (isBlogFile(fullPath.toFile())){
-                        deleteBlogSet.add(filePath);
+                        deleteBlogSet.add(fullPath);
                     }
                 }
                 log.debug("event: {}, fullPath: {}", kind.name(), fullPath);
             }
             if(!key.reset()){
+                watchPaths.remove(key);
                 log.error("file watch key reset fail.");
             }
         }
@@ -140,7 +141,17 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
 
     @Override
     public void sync() {
-        loopBlogFiles(this::updateBlogFile);
+        try {
+            Files.walkFileTree(BLOG_DIR, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    updateBlogFile(file.toFile());
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }catch (Exception e){
+            log.error("sync error", e);
+        }
     }
 
     private void updateBlogFile(File file) {
@@ -161,9 +172,9 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
             title = getFilenameWithoutSuffix(file.getName()).equalsIgnoreCase("index") ? file.getParentFile().getName() : file.getName();
         }
         var filePath = BLOG_DIR.relativize(file.toPath());
-        var blog = blogMapper.selectOne(Wrappers.<Blog>lambdaQuery().eq(Blog::getFilePath, filePath));
-        if (blog == null){
-            blog = new Blog();
+        var blogOpt = blogMapper.selectByFilePathWithoutDeleted(filePath.toString());
+        if (blogOpt.isEmpty()){
+            var blog = new Blog();
             blog.setTitle(title);
             blog.setHits(0);
             blog.setShares(0);
@@ -172,39 +183,16 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
             blog.setDeleted(false);
             blogMapper.insert(blog);
         } else {
-            blogMapper.update(null,
-                    Wrappers.<Blog>lambdaUpdate()
-                            .set(Blog::getTitle, title)
-                            .set(Blog::getFileLastModified, new Date(file.lastModified()))
-                            .set(Blog::getDeleted, false)
-                            .eq(Blog::getId, blog.getId()));
+            var blog = blogOpt.get();
+            blog.setTitle(title);
+            blog.setFileLastModified(new Date(file.lastModified()));
+            blog.setDeleted(false);
+            blogMapper.updateBaseInfoWithoutDeleted(blog);
         }
     }
 
     private static boolean isBlogFile(File file) {
         return !file.isDirectory() && (file.getName().endsWith(".md") || file.getName().endsWith(".MD"));
-    }
-
-    private void loopBlogFiles(Consumer<File> consumer){
-        File blogDir = BLOG_DIR.toFile();
-        if (!blogDir.exists()) {
-            log.warn("blog dir [{}] does not exist", BLOG_DIR);
-            return;
-        }
-        var stack = new Stack<File>();
-        stack.push(blogDir);
-        while (!stack.isEmpty()) {
-            var file = stack.pop();
-            if (file.isDirectory()) {
-                var files = file.listFiles();
-                if (files != null) {
-                    for (File f : files) {
-                        stack.push(f);
-                    }
-                }
-            }
-            consumer.accept(file);
-        }
     }
 
     private String getFilenameWithoutSuffix(String name) {
@@ -219,6 +207,7 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
                 page,
                 Wrappers.<Blog>lambdaQuery()
                         .like(keywords != null && !keywords.isBlank(), Blog::getTitle, keywords)
+                        .orderByDesc(Blog::getSort)
                         .orderByDesc(Blog::getCreatedTime)
         );
     }

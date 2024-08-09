@@ -1,0 +1,11 @@
+main, footer{
+    --footer-height: 10rem;
+}
+main {
+    /*100vh - var(--bs-navbar-padding-y) * 2 - var(--bs-navbar-brand-padding-y) * 2 - var(--bs-body-line-height) * var(--bs-navbar-brand-font-size) - footer height */
+    /*noinspection CssUnresolvedCustomProperty*/
+    min-height: calc(100vh - 0.5rem * 2 - 0.3125rem * 2 - var(--bs-body-line-height) * 1.25rem - var(--footer-height));
+}
+footer {
+    height: var(--footer-height);
+}

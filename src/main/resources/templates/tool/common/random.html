@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>随机工具</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl py-3">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="javascript:void(0)" aria-current="page">随机文本</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="javascript:void(0)">随机颜色</a>
+        </li>
+    </ul>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+<th:block th:insert="~{common/basic :: js}"/>
+</body>
+</html>

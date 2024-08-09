@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>常用工具</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <style>
+        .tool-card{
+            width: 18rem;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl py-5">
+    <div class="d-flex flex-wrap justify-content-around">
+        <div class="card tool-card">
+            <div class="card-body">
+                <h5 class="card-title">随机工具</h5>
+                <p class="card-text">随机文本、随机数字、随机颜色</p>
+                <a th:href="@{/tool/common/random}" href="javascript:void(0)" class="btn btn-primary">使用</a>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+<th:block th:insert="~{common/basic :: js}"/>
+</body>
+</html>
