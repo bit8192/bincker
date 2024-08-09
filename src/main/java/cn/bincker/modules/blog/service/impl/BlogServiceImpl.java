@@ -97,6 +97,7 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
                 var kind = event.kind();
                 if (kind == OVERFLOW) continue;
                 var filePath = (Path) event.context();
+                //TODO 路径不正确
                 var fullPath = BLOG_DIR.resolve(filePath);
                 if (kind == ENTRY_CREATE) {
                     if(fullPath.toFile().isDirectory()){
@@ -108,12 +109,11 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
                     }
                 }else if(kind == ENTRY_MODIFY){
                     if (isBlogFile(fullPath.toFile())){
-                        updateBlogSet.add(fullPath);
+                        updateBlogSet.add(filePath);
                     }
                 }else if(kind == ENTRY_DELETE){
-                    //TODO 绝对路径
                     if (isBlogFile(fullPath.toFile())){
-                        deleteBlogSet.add(fullPath);
+                        deleteBlogSet.add(filePath);
                     }
                 }
                 log.debug("event: {}, fullPath: {}", kind.name(), fullPath);
@@ -182,7 +182,7 @@ public class BlogServiceImpl implements BlogService, Runnable, ApplicationListen
     }
 
     private static boolean isBlogFile(File file) {
-        return file.isFile() && (file.getName().endsWith(".md") || file.getName().endsWith(".MD"));
+        return !file.isDirectory() && (file.getName().endsWith(".md") || file.getName().endsWith(".MD"));
     }
 
     private void loopBlogFiles(Consumer<File> consumer){
