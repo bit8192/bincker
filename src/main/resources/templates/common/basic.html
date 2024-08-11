@@ -11,7 +11,15 @@
     </th:block>
 </head>
 <body>
-<th:block th:fragment="nav">
+<th:block th:fragment="nav (autohide)">
+    <style>
+        header{
+            transition: transform ease-out .5s;
+        }
+        header.hidden{
+            transform: translateY(calc(0px - var(--bs-navbar-padding-y) * 2 - var(--bs-navbar-brand-padding-y) * 2 - var(--bs-body-line-height) * var(--bs-navbar-brand-font-size)));
+        }
+    </style>
     <header class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-xxl">
             <a class="navbar-brand" href="#">Bincker</a>
@@ -65,12 +73,52 @@
                 <!--                    </form>-->
             </div>
         </div>
-        <script>
+        <script th:inline="javascript">
             (function(){
                 const theme= localStorage.getItem("theme") || "dark";
                 [...document.getElementsByTagName("html")].forEach(e=>e.setAttribute("data-bs-theme", theme));
                 window.addEventListener("load", function(){
+                    //导航当前页选中
                     $(".navbar-nav>.nav-item>.nav-link").filter((i, e)=>location.pathname.startsWith(e.pathname) && e.pathname !== '/' || e.pathname === location.pathname).addClass("active");
+
+                    //导航自动隐藏
+                    const header = $("header");
+                    const headerHeight = header.outerHeight();
+                    const enableAutoHide = /*[[${autohide}]]*/ false;
+                    let visible = true;
+                    let prevShowTime = Date.now();
+                    let hideTask = -1;
+                    function show(v = visible = !visible){
+                        if (v){
+                            header.removeClass("hidden");
+                            clearTimeout(hideTask);
+                            hideTask = -1;
+                        }else{
+                            header.addClass("hidden");
+                        }
+                    }
+                    function delayHide() {
+                        if (hideTask === -1 && visible){
+                            hideTask = setTimeout(function () {
+                                show(visible = false);
+                                hideTask = -1;
+                            }, 3000)
+                        }
+                    }
+                    if (enableAutoHide){
+                        delayHide();
+                        header.hover(function (){
+                            show(visible = true);
+                        }, delayHide);
+                    }
+                    $(document.body).mousemove(function(event){
+                        if (event.originalEvent.clientY < headerHeight) {
+                            show(visible = true);
+                            prevShowTime = Date.now();
+                        }else{
+                            delayHide()
+                        }
+                    });
                 });
             })()
         </script>
