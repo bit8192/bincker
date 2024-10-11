@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${blog.getTitle()}">Blog Title</title>
     <th:block th:insert="~{common/basic :: css}" />
+    <th:block th:insert="~{common/basic :: js}" />
 </head>
 <body>
-<th:block th:insert="~{common/basic :: nav}"/>
+<th:block th:insert="~{common/basic :: nav (autohide = true)}"/>
 <main class="container-xxl">
 <p th:utext="*{content}">
     content
@@ -30,7 +31,6 @@
     </div>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
-<th:block th:insert="~{common/basic :: js}" />
 <script th:inline="javascript">
     (function(){
         $.post(/*[[${'/blog/hit/' + blog.getId()}]]*/ "/blog/hit/id")

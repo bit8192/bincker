@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
     <th:block th:insert="~{common/basic :: css}" />
+    <th:block th:insert="~{common/basic :: js}" />
 </head>
 <body>
-<th:block th:insert="~{common/basic :: nav(true)}" />
+<th:block th:insert="~{common/basic :: nav}" />
 <main class="container-xxl d-flex flex-row justify-content-center">
     <div class="w-75" style="margin-top: 25%">
         <div class="input-group input-group-lg">
@@ -17,6 +18,10 @@
     </div>
 </main>
 <th:block th:insert="~{common/basic :: footer}" />
-<th:block th:insert="~{common/basic :: js}" />
+<script>
+    $(function () {
+        $(".search-input").focus();
+    });
+</script>
 </body>
 </html>
