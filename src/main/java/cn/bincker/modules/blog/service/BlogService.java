@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface BlogService {
     Path BLOG_DIR = Path.of("blog");
+    String DEFAULT_MD_SUFFIX = ".md";
+    String META_FILE_SUFFIX = ".meta.json";
 
     void sync();
 
@@ -16,9 +18,11 @@ public interface BlogService {
 
     Optional<Blog> getByPath(String path);
 
-    void hit(Long id);
+    void view(String path);
 
-    void share(Long id);
+    void like(String path);
+
+    void share(String path);
 
     String renderBlogContent(Blog blog);
 }

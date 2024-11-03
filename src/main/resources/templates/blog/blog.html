@@ -16,7 +16,7 @@
     <hr />
     <div class="text-secondary pb-3">
         <i class="bi bi-eye"></i>
-        <span th:text="${blog.getHits()}">0</span>
+        <span th:text="${blog.getLikes()}">0</span>
         |
         <a class="icon-link icon-link-hover link-secondary link-underline-secondary" href="javascript:void(0)" style="--bs-icon-link-transform: translate3d(0, -.25rem, 0);">
             <i class="bi bi-share"></i>
@@ -24,16 +24,20 @@
         <span th:text="${blog.getShares()}">0</span>
         |
         <i class="bi bi-upload"></i>
-        <span th:text="${#dates.format(blog.getCreatedTime(), 'yyyy-MM-dd HH:mm:ss')}">2024-08-07 00:00:00</span>
+        <span th:text="${#dates.format(blog.getFileCreatedTime(), 'yyyy-MM-dd HH:mm:ss')}">2024-08-07 00:00:00</span>
         |
         <i class="bi bi-pencil"></i>
-        <span th:text="${#dates.format(blog.getUpdatedTime(), 'yyyy-MM-dd HH:mm:ss')}">2024-08-07 00:00:00</span>
+        <span th:text="${#dates.format(blog.getFileLastModified(), 'yyyy-MM-dd HH:mm:ss')}">2024-08-07 00:00:00</span>
     </div>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
 <script th:inline="javascript">
     (function(){
-        $.post(/*[[${'/blog/hit/' + blog.getId()}]]*/ "/blog/hit/id")
+        $.post({
+            url: location.pathname,
+            contentType: "application/json",
+            data: JSON.stringify({type: 'VIEW'})
+        });
     })()
 </script>
 </body>

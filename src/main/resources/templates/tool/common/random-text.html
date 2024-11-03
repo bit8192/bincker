@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>随机文本</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl py-3">
+    <div>
+        <label class="w-100">
+            <span class="h4">字典</span>
+            <textarea class="form-control" rows="5" id="dictionary">0123456789abcdefghijklmnopqrstuvwxyz</textarea>
+        </label>
+        <div class="d-flex flex-row align-items-center justify-content-between pr-3">
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary" id="btn-add-number">数字</button>
+                <button class="btn btn-outline-secondary" id="btn-add-lower-case-letter">小写字母</button>
+                <button class="btn btn-outline-secondary" id="btn-add-upper-case-letter">大写字母</button>
+                <button class="btn btn-outline-secondary" id="btn-add-symbol">符号</button>
+                <button class="btn btn-outline-secondary" id="btn-add-emoji">Emoji表情</button>
+                <button class="btn btn-outline-secondary" id="btn-add-simple-chinese">简体中文</button>
+                <button class="btn btn-outline-secondary" id="btn-add-traditional-chinese">繁体中文</button>
+                <button class="btn btn-outline-danger" id="btn-clean-dictionary">清空</button>
+            </div>
+            <div><span class="text-secondary" ><span id="text-dictionary-length">0</span> char</span></div>
+        </div>
+        <hr />
+        <div class="input-group">
+            <input class="form-control" type="number" min="0" id="input-generate-length" placeholder="生成长度" value="16"/>
+            <button class="btn btn-primary px-5" id="btn-generate">生成</button>
+            <button class="btn btn-outline-primary" id="btn-copy">复制结果</button>
+        </div>
+        <p id="text-result" class="mt-3 text-break"></p>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+<script>
+    (function (){
+        // 遍历emoji表情
+        function iterateEmojis() {
+            const emojiRanges = [
+                '\u{1F600}-\u{1F64F}', // Emoticons
+                '\u{1F300}-\u{1F5FF}', // Miscellaneous Symbols and Pictographs
+                '\u{1F680}-\u{1F6FF}', // Transport and Map Symbols
+                '\u{1F700}-\u{1F77F}', // Alchemical Symbols
+                '\u{1F780}-\u{1F7FF}', // Geometric Shapes Extended
+                '\u{1F800}-\u{1F8FF}', // Supplemental Arrows-C
+                '\u{1F900}-\u{1F9FF}', // Supplemental Symbols and Pictographs
+                '\u{1FA00}-\u{1FA6F}', // Chess Symbols
+                '\u{1FA70}-\u{1FAFF}', // Symbols and Pictographs Extended-A
+                '\u{2600}-\u{26FF}',   // Miscellaneous Symbols
+                '\u{2700}-\u{27BF}',   // Dingbats
+                '\u{1F1E6}-\u{1F1FF}'  // Flags
+            ];
+
+            const emojiRegex = new RegExp(`[${emojiRanges.join('')}]`, 'u');
+
+            let result = "";
+            for (let i = 0; i <= 0x10FFFF; i++) {
+                const char = String.fromCodePoint(i);
+                if (emojiRegex.test(char)) {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        // 遍历简体中文
+        function iterateSimplifiedChinese() {
+            const simplifiedChineseRange = '\u4E00-\u9FFF';
+            const simplifiedChineseRegex = new RegExp(`[${simplifiedChineseRange}]`, 'u');
+
+            let result = "";
+            for (let i = 0x4E00; i <= 0x9FFF; i++) {
+                const char = String.fromCodePoint(i);
+                if (simplifiedChineseRegex.test(char)) {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        // 遍历繁体中文
+        function iterateTraditionalChinese() {
+            const traditionalChineseRange = '\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF';
+            const traditionalChineseRegex = new RegExp(`[${traditionalChineseRange}]`, 'u');
+
+            let result = "";
+            for (let i = 0x3400; i <= 0x4DBF; i++) {
+                const char = String.fromCodePoint(i);
+                if (traditionalChineseRegex.test(char)) {
+                    result += char;
+                }
+            }
+
+            for (let i = 0x4E00; i <= 0x9FFF; i++) {
+                const char = String.fromCodePoint(i);
+                if (traditionalChineseRegex.test(char)) {
+                    result += char;
+                }
+            }
+
+            for (let i = 0xF900; i <= 0xFAFF; i++) {
+                const char = String.fromCodePoint(i);
+                if (traditionalChineseRegex.test(char)) {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        const dictionaryTextarea = $("#dictionary");
+        const textDictionaryLength = $("#text-dictionary-length");
+
+        dictionaryTextarea.on("input", updateDictionaryLength);
+        function updateDictionaryLength(){
+            textDictionaryLength.text(dictionaryTextarea.val().length);
+        }
+        updateDictionaryLength();
+
+        $("#btn-add-number").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + "0123456789");
+        });
+
+        $("#btn-add-lower-case-letter").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + "abcdefghijklmnopqrstuvwxyz");
+            updateDictionaryLength();
+        });
+
+        $("#btn-add-upper-case-letter").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            updateDictionaryLength();
+        });
+
+        $("#btn-add-symbol").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + "-=[]\\;',./!@#$%^&*()_+{}|:\"<>?");
+            updateDictionaryLength();
+        });
+
+        $("#btn-add-emoji").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + iterateEmojis());
+            updateDictionaryLength();
+        });
+
+        $("#btn-add-simple-chinese").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + iterateSimplifiedChinese());
+            updateDictionaryLength();
+        });
+
+        $("#btn-add-traditional-chinese").click(function () {
+            dictionaryTextarea.text(dictionaryTextarea.val() + iterateTraditionalChinese());
+            updateDictionaryLength();
+        });
+
+        $("#btn-clean-dictionary").click(function () {
+            dictionaryTextarea.text("");
+            updateDictionaryLength();
+        });
+
+        const resultElement = $("#text-result");
+        const inputGenerateLength = $("#input-generate-length");
+        $("#btn-generate").click(function () {
+            const dictionaryLength = dictionaryTextarea.text().length;
+            if (dictionaryTextarea.text().length === 0) {
+                return;
+            }
+            const generateLength = parseInt(inputGenerateLength.val());
+            console.log(generateLength, inputGenerateLength.val(), generateLength > Number.MAX_VALUE);
+            if (isNaN(generateLength) || generateLength <= 0 || generateLength > Number.MAX_VALUE) {
+                return;
+            }
+            let result = "";
+            for (let i = 0; i < generateLength; i++) {
+                result += dictionaryTextarea.text().charAt(Math.floor(Math.random() * dictionaryLength));
+            }
+            resultElement.text(result);
+        });
+
+        $("#btn-copy").click(function () {
+            navigator.clipboard.writeText(resultElement.text());
+        });
+    })();
+</script>
+</body>
+</html>

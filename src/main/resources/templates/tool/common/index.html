@@ -11,6 +11,23 @@
             width: 18rem;
             margin-bottom: 1em;
         }
+        .tool-card>.card-body{
+            display: flex;
+            flex-direction: column;
+        }
+        .card-text{
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .open-tool-btn i{
+            position: relative;
+            left: 0;
+            transition: left .5s;
+        }
+        .open-tool-btn:hover i{
+            left: 90%;
+        }
     </style>
 </head>
 <body>
@@ -19,9 +36,46 @@
     <div class="d-flex flex-wrap justify-content-around">
         <div class="card tool-card">
             <div class="card-body">
-                <h5 class="card-title">随机工具</h5>
-                <p class="card-text">随机文本、随机数字、随机颜色</p>
-                <a th:href="@{/tool/common/random}" href="javascript:void(0)" class="btn btn-primary">使用</a>
+                <h5 class="card-title">随机文本</h5>
+                <p class="card-text">
+                    根据字典生成随机文本
+                </p>
+                <a th:href="@{/tool/common/random-text}" href="javascript:void(0)" class="d-block text-body open-tool-btn">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card tool-card">
+            <div class="card-body">
+                <h5 class="card-title">随机颜色</h5>
+                <p class="card-text">
+                    随机生成颜色和颜色搭配
+                </p>
+                <a th:href="@{/tool/common/random-color}" href="javascript:void(0)" class="d-block text-body open-tool-btn">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card tool-card">
+            <div class="card-body">
+                <h5 class="card-title">随机中文名</h5>
+                <p class="card-text">
+                    随机生成中文名，取名、网络面具利器
+                </p>
+                <a th:href="@{/tool/common/random-text}" href="javascript:void(0)" class="d-block text-body open-tool-btn">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card tool-card">
+            <div class="card-body">
+                <h5 class="card-title">随机英文名</h5>
+                <p class="card-text">
+                    随机生成英文名，网络面具必备
+                </p>
+                <a th:href="@{/tool/common/random-text}" href="javascript:void(0)" class="d-block text-body open-tool-btn">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
         </div>
     </div>

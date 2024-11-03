@@ -1,25 +1,44 @@
 package cn.bincker.modules.blog.entity;
 
-import cn.bincker.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.nio.file.Path;
 import java.util.Date;
+import java.util.List;
 
-@TableName("blog")
 @Getter
 @Setter
-public class Blog extends BaseEntity {
+public class Blog {
     private String title;
 
-    private String filePath;
+    private List<String> tags;
+
+    private String keywords;
+
+    private Path filePath;
 
     private Integer sort;
 
-    private Integer hits;
+    private Long views;
 
-    private Integer shares;
+    private Long likes;
+
+    private Long shares;
 
     private Date fileLastModified;
+
+    private Date fileCreatedTime;
+
+    synchronized public void setViews(Long views) {
+        this.views = views;
+    }
+
+    synchronized public void setLikes(Long likes) {
+        this.likes = likes;
+    }
+
+    synchronized public void setShares(Long shares) {
+        this.shares = shares;
+    }
 }

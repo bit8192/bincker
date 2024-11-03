@@ -1,5 +1,6 @@
 package cn.bincker.modules.blog.controller;
 
+import cn.bincker.modules.blog.dto.BlogHitDto;
 import cn.bincker.modules.blog.entity.Blog;
 import cn.bincker.modules.blog.handler.BlogResourceRequestHandler;
 import cn.bincker.modules.blog.service.BlogService;
@@ -49,15 +50,16 @@ public class BlogController {
         return "blog/blog";
     }
 
-    @PostMapping("/hit/{id}")
+    @PostMapping("/**")
     @ResponseBody
-    public void hit(@PathVariable Long id){
-        blogService.hit(id);
-    }
-
-    @PostMapping("/share/{id}")
-    @ResponseBody
-    public void share(@PathVariable Long id){
-        blogService.share(id);
+    public void hit(HttpServletRequest request, @RequestBody BlogHitDto dto){
+        var path = request.getRequestURI().replaceAll("^/blog/", "");
+        if (dto.getType() == BlogHitDto.Type.VIEW) {
+            blogService.view(path);
+        }else if (dto.getType() == BlogHitDto.Type.LIKE){
+            blogService.like(path);
+        }else if (dto.getType() == BlogHitDto.Type.SHARE){
+            blogService.share(path);
+        }
     }
 }

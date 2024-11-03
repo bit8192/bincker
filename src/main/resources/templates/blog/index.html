@@ -10,12 +10,10 @@
 <body>
 <th:block th:insert="~{common/basic :: nav}"/>
 <main class="container-xxl">
-    <div class="text-md-center">
-        <p class="text-secondary-emphasis fs-1 p-4">这人懒得一批，会写博客？</p>
-    </div>
-    <ul>
-        <li th:each="blog : ${page.getRecords()}">
-            <a th:text="${blog.getTitle()}" th:href="@{'/blog/' + ${blog.getFilePath()}}">Title</a>
+    <ul class="p-3 list-unstyled">
+        <li th:each="blog : ${page.getRecords()}" class="mb-4 d-flex justify-content-between">
+            <a th:text="${blog.getTitle()}" th:href="@{'/blog/' + ${blog.getFilePath()}}" class="text-body h5">Title</a>
+            <span class="text-secondary" th:text="${#dates.format(blog.getFileCreatedTime(), 'yyyy-MM-dd')}" style="font-size: 0.8rem"></span>
         </li>
     </ul>
 </main>

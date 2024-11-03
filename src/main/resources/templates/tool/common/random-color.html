@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>随机颜色</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+    <div class="text-center mt-3">
+        <button class="btn btn-lg btn-primary px-5" id="btn-generate">生   成</button>
+        <div class="mt-5 mx-auto row justify-content-center">
+            <div class="col-2 d-flex justify-content-center align-items-center">
+                <input type="color" class="d-none" id="input-color" />
+                <label for="input-color">
+                    <div id="color" style="width: 12em; height: 12em; border-radius: 6em; border: 3px solid white; cursor: pointer"></div>
+                </label>
+            </div>
+            <div class="col-2 d-flex flex-column justify-content-center align-items-start">
+                <div>R:&nbsp;<span id="color-r"></span></div>
+                <div>G:&nbsp;<span id="color-g"></span></div>
+                <div>B:&nbsp;<span id="color-b"></span></div>
+                <div>A:&nbsp;<span id="color-a"></span></div>
+                <div class="text-nowrap"><span id="text-color-default">#000000</span><a href="javascript:void(0)" class="text-decoration-underline px-1 btn-copy-color"><i class="bi bi-copy"></i></a></div>
+                <div class="text-nowrap"><span id="text-color-rgb">rgb(0, 0, 0)</span><a href="javascript:void(0)" class="text-decoration-underline px-1 btn-copy-color"><i class="bi bi-copy"></i></a></div>
+                <div class="text-nowrap"><span id="text-color-default-with-alpha">#00000000</span><a href="javascript:void(0)" class="text-decoration-underline px-1 btn-copy-color"><i class="bi bi-copy"></i></a></div>
+                <div class="text-nowrap"><span id="text-color-rgba">rgba(0, 0, 0, 0)</span><a href="javascript:void(0)" class="text-decoration-underline px-1 btn-copy-color"><i class="bi bi-copy"></i></a></div>
+            </div>
+        </div>
+        <hr class="mt-5" />
+        <div class="d-flex flex-row justify-content-around">
+            <div class="flex-grow-1 me-3">
+                <label for="input-contrast">对比度</label>
+                <input type="range" class="form-range" id="input-contrast" min="0" max="255" step="1" value="100" />
+            </div>
+            <button class="btn btn-lg btn-primary px-5" id="btn-generate-match-colors">生成配色</button>
+        </div>
+        <div class="d-flex flex-row">
+            <pre id="pre-match-colors"></pre>
+            <div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+<script>
+    (function () {
+        const colorView = $('#color');
+        const inputColor = $('#input-color');
+        const colorR = $('#color-r');
+        const colorG = $('#color-g');
+        const colorB = $('#color-b');
+        const colorA = $('#color-a');
+        const textColorDefault = $('#text-color-default');
+        const textColorRgb = $('#text-color-rgb');
+        const textColorDefaultWithAlpha = $('#text-color-default-with-alpha');
+        const textColorRgba = $('#text-color-rgba');
+        const color = [0, 0, 0, 0];
+
+        inputColor.on('change', updateColor);
+
+        function updateColor() {
+            const colorMatch = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})/.exec(inputColor.val());
+            if (!colorMatch) return;
+            colorView.css('background-color', inputColor.val());
+            for (let i = 0; i < 3; i++) {
+                color[i] = parseInt(colorMatch[i + 1], 16);
+            }
+            colorR.text(color[0]);
+            colorG.text(color[1]);
+            colorB.text(color[2]);
+            colorA.text(color[3]);
+            textColorDefault.text(inputColor.val());
+            textColorRgb.text("rgb(" + color.concat().splice(0,3).join(", ") + ")");
+            textColorDefaultWithAlpha.text(inputColor.val() + color[3].toString(16));
+            textColorRgba.text("rgba(" + color.join(", ") + ")");
+        }
+
+        $(".btn-copy-color").click(function (e) {
+            navigator.clipboard.writeText(e.currentTarget.previousSibling.innerText);
+        });
+
+        $("#btn-generate").click(function () {
+            for (let i = 0; i < 4; i++) {
+                color[i] = Math.floor(Math.random() * 255);
+            }
+            function numFormat(num) {
+                const s = num.toString(16);
+                if (s.length < 2) return "0" + s;
+                return s;
+            }
+            const colorValue = "#" + color.concat().splice(0, 3).map(c=>numFormat(c)).join("");
+            inputColor.val(colorValue);
+            updateColor();
+        });
+    })();
+</script>
+</body>
+</html>
