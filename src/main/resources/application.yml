@@ -3,6 +3,7 @@ spring:
     name: bincker
   datasource:
     url: jdbc:sqlite:database.db
+    driver-class-name: org.sqlite.JDBC
 mybatis-plus:
   global-config:
     db-config:
