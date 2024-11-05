@@ -4,10 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
-      <change afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
+    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="部署脚本">
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/401.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/controller/BlogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/controller/BlogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/entity/Blog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/entity/Blog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/BlogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/BlogService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/impl/BlogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/impl/BlogServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/page-loading.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/page-loading.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/common/basic.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/common/basic.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,8 +76,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Thymeleaf" />
+        <option value="HTML File" />
       </list>
     </option>
     <option name="SCHEME" value="Project" />
@@ -105,11 +116,12 @@
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.BinckerApplication.executor&quot;: &quot;Debug&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last.edited.regexp&quot;: &quot;#000000&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/bincker/IdeaProjects/bincker&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/bincker/IdeaProjects/bincker/src/main/resources/templates&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -123,7 +135,11 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/templates" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/blog" />
       <recent name="$PROJECT_DIR$/src/main/resources/static" />
       <recent name="$PROJECT_DIR$/src/main/resources/static/image" />
       <recent name="$PROJECT_DIR$/src/main/resources/static/css" />
@@ -160,7 +176,8 @@
       <workItem from="1730609990722" duration="289000" />
       <workItem from="1730613836994" duration="11046000" />
       <workItem from="1730624900894" duration="9536000" />
-      <workItem from="1730738303580" duration="3212000" />
+      <workItem from="1730738303580" duration="3468000" />
+      <workItem from="1730809753077" duration="12982000" />
     </task>
     <task id="LOCAL-00001" summary="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
       <option name="closed" value="true" />
@@ -170,7 +187,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730635368319</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="部署脚本">
+      <option name="closed" value="true" />
+      <created>1730741665770</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1730741665770</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,6 +203,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源" />
-    <option name="LAST_COMMIT_MESSAGE" value="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源" />
+    <MESSAGE value="部署脚本" />
+    <option name="LAST_COMMIT_MESSAGE" value="部署脚本" />
   </component>
 </project>

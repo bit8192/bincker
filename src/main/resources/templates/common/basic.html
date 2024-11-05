@@ -16,14 +16,19 @@
     <style>
         header{
             transition: transform ease-out .5s;
+            height: var(--navbar-height);
         }
         header.hidden{
             transform: translateY(calc(0px - var(--bs-navbar-padding-y) * 2 - var(--bs-navbar-brand-padding-y) * 2 - var(--bs-body-line-height) * var(--bs-navbar-brand-font-size)));
         }
+        .nav-item{
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+        }
     </style>
     <header class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-xxl">
-            <a class="navbar-brand" href="#">Bincker</a>
+            <a class="navbar-brand fs-3" href="#">Bincker</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>

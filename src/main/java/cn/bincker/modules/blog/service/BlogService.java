@@ -25,4 +25,9 @@ public interface BlogService {
     void share(String path);
 
     String renderBlogContent(Blog blog);
+
+    /**
+     * 判断资源是否安全，可供下载
+     */
+    boolean isSafeResource(String path);
 }

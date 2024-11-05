@@ -67,11 +67,18 @@
             {key: "bt", url: keywords=>"https://www.1lou.me/search-_" + [...new TextEncoder().encode(keywords)].map(i=>i.toString(16).toUpperCase()).join("_") + "-1.htm", icon: "https://www.1lou.me/plugin/fox_theme_btbttme/fox/img/logo.gif"},
         ];
         const searchEngineMap = searchEngines.reduce((acc, item) => (acc[item.key] = item, acc), {});
-        let currentSearchEngines;
+        let currentSearchEngines = +localStorage.getItem("searchEngines");
+        if (isInvalidEngineIndex(currentSearchEngines)) currentSearchEngines = 0;
         const searchInput = $(".search-input");
         searchInput.focus();
+
+        function isInvalidEngineIndex(engineIndex) {
+            return searchEngines.length < 1 || engineIndex < 0 || engineIndex + 1 > searchEngines.length;
+        }
+
         function selectSearchEngines(engineIndex) {
-            if (searchEngines.length < 1 || engineIndex < 0 || engineIndex + 1 > searchEngines.length) return;
+            if (isInvalidEngineIndex(engineIndex)) return;
+            localStorage.setItem("searchEngines", engineIndex);
             currentSearchEngines = engineIndex;
             let iconContainer = $("#search-engine-icon-container");
             let engine = searchEngines[currentSearchEngines];
@@ -79,7 +86,7 @@
             if (engine.icon.startsWith("<")){
                 iconContainer.append($(engine.icon));
             }else{
-                const tag = engine.iconTagName ? $(document.createElement(engine.iconTagName)) : $('<img alt="icon" src="' + engine.icon + '" />');
+                const tag = $('<img alt="icon" src="' + engine.icon + '" />');
                 if (engine.iconStyle) {
                     if (typeof(engine.iconStyle) === 'string'){
                         tag.attr('style', engine.iconStyle);
@@ -90,7 +97,7 @@
                 iconContainer.append(tag);
             }
         }
-        selectSearchEngines(0);
+        selectSearchEngines(currentSearchEngines);
 
         function search() {
             let url = searchEngines[currentSearchEngines].url;
@@ -135,6 +142,8 @@
                 e.preventDefault();
             }
         });
+
+        searchInput.on("blur", ()=>setTimeout(()=>searchInput.focus(), 0));
 
         $("#search-button").click(search);
 

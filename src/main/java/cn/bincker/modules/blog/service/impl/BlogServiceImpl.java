@@ -427,6 +427,11 @@ public class BlogServiceImpl implements BlogService, ApplicationListener<Applica
         }
     }
 
+    @Override
+    public boolean isSafeResource(String path) {
+        return !path.endsWith(DEFAULT_MD_SUFFIX) && !path.endsWith(DEFAULT_MD_SUFFIX.toUpperCase()) && !path.endsWith(META_FILE_SUFFIX);
+    }
+
     @AllArgsConstructor
     private static class BlogPersistenceObject{
         private Blog blog;

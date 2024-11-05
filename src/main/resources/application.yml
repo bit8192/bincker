@@ -4,10 +4,9 @@ spring:
   datasource:
     url: jdbc:sqlite:database.db
     driver-class-name: org.sqlite.JDBC
+  profiles:
+    active: local
 mybatis-plus:
   global-config:
     db-config:
       logic-delete-field: deleted
-logging:
-  level:
-    cn.bincker: debug

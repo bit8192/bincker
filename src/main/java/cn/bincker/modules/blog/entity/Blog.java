@@ -30,6 +30,11 @@ public class Blog {
 
     private Date fileCreatedTime;
 
+    /**
+     * 认证
+     */
+    private String authorization;
+
     synchronized public void setViews(Long views) {
         this.views = views;
     }
