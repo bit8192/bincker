@@ -15,6 +15,6 @@ public class CommonToolController {
 
     @GetMapping("/*")
     public String random(HttpServletRequest request) {
-        return request.getRequestURI();
+        return request.getRequestURI().replaceFirst("^/", "");
     }
 }
