@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
 METHOD="$1"
 SERVER_HOST="$2"
