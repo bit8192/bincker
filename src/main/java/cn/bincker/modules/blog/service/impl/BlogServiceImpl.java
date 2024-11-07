@@ -170,6 +170,7 @@ public class BlogServiceImpl implements BlogService, ApplicationListener<Applica
                         }else{
                             //当有持久化请求后需要再等一分钟，如果这期间没有相同请求再进行持久化
                             metaLock.wait();
+                            if (!running) break;
                             //noinspection BusyWait
                             Thread.sleep(60000);
                         }
@@ -193,6 +194,9 @@ public class BlogServiceImpl implements BlogService, ApplicationListener<Applica
             sync();
         }else if (event instanceof ContextClosedEvent) {
             running = false;
+            synchronized (metaLock) {
+                metaLock.notifyAll();
+            }
         }
     }
 

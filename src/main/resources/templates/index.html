@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Title</title>
+    <title>Bincker</title>
     <th:block th:insert="~{common/basic :: css}" />
     <th:block th:insert="~{common/basic :: js}" />
     <style>
@@ -102,15 +102,17 @@
 
         function search() {
             let url = searchEngines[currentSearchEngines].url;
+            const keywords = searchInput.val();
+            if (!keywords || !keywords.length) return;
             if (typeof(url) === 'string'){
                 if (url.includes("{{keywords}}")){
-                    url = url.replace("{{keywords}}", encodeURIComponent(searchInput.val()));
+                    url = url.replace("{{keywords}}", encodeURIComponent(keywords));
                 }
                 if (url.includes("{{base64keywords}}")){
-                    url = url.replace("{{base64keywords}}", encodeURIComponent(btoa(searchInput.val())));
+                    url = url.replace("{{base64keywords}}", encodeURIComponent(btoa(keywords)));
                 }
             }else if (typeof(url) === 'function'){
-                url = url(searchInput.val());
+                url = url(keywords);
             }
             window.open(url, "_blank");
         }
@@ -118,6 +120,7 @@
         searchInput.on("keyup", (e) => {
             if (e.key === "Tab") {
                 let nextEngine;
+                if (e.altKey) return;
                 if (e.shiftKey){
                     nextEngine = currentSearchEngines < 1 ? searchEngines.length - 1 : currentSearchEngines - 1;
                 }else{
