@@ -117,10 +117,19 @@
             window.open(url, "_blank");
         }
 
+        let prevDownKey;
+        searchInput.on("keydown", e => {
+            if (e.key === "Tab") {
+                e.preventDefault();
+            }
+            prevDownKey = e.keyCode;
+        });
+
         searchInput.on("keyup", (e) => {
+            if (e.keyCode !== prevDownKey) return;//防止从其他Tab或者窗口切换回来时误触发
             if (e.key === "Tab") {
                 let nextEngine;
-                if (e.altKey) return;
+                if (e.altKey || e.ctrlKey) return;
                 if (e.shiftKey){
                     nextEngine = currentSearchEngines < 1 ? searchEngines.length - 1 : currentSearchEngines - 1;
                 }else{
@@ -138,12 +147,6 @@
             if ((result = engineQuickRegex.exec(e.target.value)) !== null && searchEngineMap[result[1]]){
                 selectSearchEngines(searchEngines.findIndex(e=>e.key === result[1]));
                 e.target.value = "";
-            }
-        });
-
-        searchInput.on("keydown", e => {
-            if (e.key === "Tab") {
-                e.preventDefault();
             }
         });
 
