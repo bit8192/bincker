@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="部署脚本">
-      <change afterPath="$PROJECT_DIR$/windows-dev.Dockerfile" afterDir="false" />
+    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复">
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sync-blog.sh" beforeDir="false" afterPath="$PROJECT_DIR$/sync-blog.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +67,6 @@
       <list>
         <option value="Thymeleaf" />
         <option value="HTML File" />
-        <option value="Dockerfile" />
       </list>
     </option>
     <option name="SCHEME" value="Project" />
@@ -83,12 +80,12 @@
     &quot;assignee&quot;: &quot;bit8192&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/bit8192/bincker.git",
-    "accountId": "bce3730f-fc62-481c-997e-cec167ca34cc"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/bit8192/bincker.git&quot;,
+    &quot;accountId&quot;: &quot;522805a0-e0a2-4142-925f-254bd44bcbae&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -109,12 +106,13 @@
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.BinckerApplication.executor&quot;: &quot;Debug&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last.edited.regexp&quot;: &quot;#000000&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/bincker/IdeaProjects/bincker/src/main/resources/templates&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/bincker/IdeaProjects/bincker/blog/OperationRecord/MoviePilot&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -123,25 +121,33 @@
     &quot;project.structure.last.edited&quot;: &quot;Problems&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;fileTemplates&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/blog/OperationRecord/MoviePilot" />
       <recent name="$PROJECT_DIR$/src/main/resources/templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/blog/OperationRecord/MoviePilot" />
       <recent name="$PROJECT_DIR$/blog" />
       <recent name="$PROJECT_DIR$/src/main/resources/static" />
       <recent name="$PROJECT_DIR$/src/main/resources/static/image" />
       <recent name="$PROJECT_DIR$/src/main/resources/static/css" />
     </key>
   </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="open res-info-ai" />
+      <command value="open jy-back-service" />
+    </option>
+  </component>
   <component name="RunManager">
     <configuration name="BinckerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
-      <module name="cn.bincker.bincker.main" />
+      <module name="bincker.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="cn.bincker.BinckerApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -151,8 +157,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.218" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.218" />
       </set>
     </attachedChunks>
   </component>
@@ -171,7 +177,14 @@
       <workItem from="1730624900894" duration="9536000" />
       <workItem from="1730738303580" duration="3468000" />
       <workItem from="1730809753077" duration="12982000" />
-      <workItem from="1731418491767" duration="3366000" />
+      <workItem from="1730942521121" duration="118000" />
+      <workItem from="1730942648437" duration="5030000" />
+      <workItem from="1730966401642" duration="7968000" />
+      <workItem from="1731393537706" duration="135000" />
+      <workItem from="1731920730510" duration="1922000" />
+      <workItem from="1731982637665" duration="760000" />
+      <workItem from="1734072880194" duration="9333000" />
+      <workItem from="1736818692544" duration="848000" />
     </task>
     <task id="LOCAL-00001" summary="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
       <option name="closed" value="true" />
@@ -189,16 +202,48 @@
       <option name="project" value="LOCAL" />
       <updated>1730741665770</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="添加github搜索引擎">
+      <option name="closed" value="true" />
+      <created>1730881718250</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1730881718250</updated>
+    </task>
+    <task id="LOCAL-00004" summary="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复">
+      <option name="closed" value="true" />
+      <created>1730961944444</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1730961944444</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源" />
     <MESSAGE value="部署脚本" />
-    <MESSAGE value="nav导航自动隐藏" />
-    <option name="LAST_COMMIT_MESSAGE" value="nav导航自动隐藏" />
+    <MESSAGE value="添加github搜索引擎" />
+    <MESSAGE value="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复" />
+    <option name="LAST_COMMIT_MESSAGE" value="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

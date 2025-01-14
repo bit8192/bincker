@@ -20,11 +20,11 @@ if [ -z "$SERVER_HOST" ]; then
 fi
 
 function pull() {
-  rsync -chavzP --progress "$SERVER_HOST:$REMOTE_BLOG_PATH/" $LOCAL_BLOG_PATH;
+  rsync -chavzP --progress --exclude '*.meta.json' "$SERVER_HOST:$REMOTE_BLOG_PATH/" $LOCAL_BLOG_PATH;
 }
 
 function push() {
-  rsync -chavzP --progress blog/ "$SERVER_HOST:$REMOTE_BLOG_PATH"
+  rsync -chavzP --progress --exclude '*.meta.json' blog/ "$SERVER_HOST:$REMOTE_BLOG_PATH"
 }
 
 $METHOD
