@@ -59,8 +59,9 @@ public class BlogServiceImpl implements BlogService, ApplicationListener<Applica
         watchService = FileSystems.getDefault().newWatchService();
         Files.walkFileTree(BLOG_DIR, new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+            public @NotNull FileVisitResult preVisitDirectory(Path dir, @NotNull BasicFileAttributes attrs) {
                 try {
+                    log.debug("watch dir:{}", dir);
                     watchPaths.put(dir.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), dir);
                 } catch (IOException e) {
                     throw new RuntimeException(e);

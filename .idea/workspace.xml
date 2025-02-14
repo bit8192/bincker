@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="调整同步脚本">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sync-blog.sh" beforeDir="false" afterPath="$PROJECT_DIR$/sync-blog.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/impl/BlogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/impl/BlogServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-color.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-color.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-text.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-text.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +119,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Problems&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
@@ -157,8 +158,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.218" />
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.218" />
+        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.23654.189" />
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-IU-243.23654.189" />
       </set>
     </attachedChunks>
   </component>
@@ -184,7 +185,11 @@
       <workItem from="1731920730510" duration="1922000" />
       <workItem from="1731982637665" duration="760000" />
       <workItem from="1734072880194" duration="9333000" />
-      <workItem from="1736818692544" duration="848000" />
+      <workItem from="1736818692544" duration="2143000" />
+      <workItem from="1737338254290" duration="11789000" />
+      <workItem from="1739341461892" duration="209000" />
+      <workItem from="1739341681289" duration="12365000" />
+      <workItem from="1739498629738" duration="2951000" />
     </task>
     <task id="LOCAL-00001" summary="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
       <option name="closed" value="true" />
@@ -218,7 +223,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730961944444</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="调整同步脚本">
+      <option name="closed" value="true" />
+      <created>1736819559837</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1736819559838</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -240,7 +253,8 @@
     <MESSAGE value="部署脚本" />
     <MESSAGE value="添加github搜索引擎" />
     <MESSAGE value="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复" />
-    <option name="LAST_COMMIT_MESSAGE" value="首页全局按键监听BUG修复&#10;导航栏高度调整&#10;服务停止过慢问题BUG修复" />
+    <MESSAGE value="调整同步脚本" />
+    <option name="LAST_COMMIT_MESSAGE" value="调整同步脚本" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
