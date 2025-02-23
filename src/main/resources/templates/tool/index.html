@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>常用工具</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+    <style>
+        .tool-card{
+            width: 18rem;
+            margin-bottom: 1em;
+        }
+        .tool-card>.card-body{
+            display: flex;
+            flex-direction: column;
+        }
+        .card-text{
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .open-tool-btn i{
+            position: relative;
+            left: 0;
+            transition: left .5s;
+        }
+        .tool-card:hover i{
+            left: 90%;
+        }
+    </style>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl py-5">
+    <div class="d-flex flex-wrap justify-content-around">
+        <div class="card tool-card" th:each="tool : ${tools}">
+            <a th:href="@{${tool.getPath()}}" class="card-body text-decoration-none">
+                <h5 class="card-title" th:text="${tool.getName()}">标题</h5>
+                <p class="card-text" th:text="${tool.getDescription()}">
+                    描述
+                </p>
+                <div class="d-block text-body open-tool-btn">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+</body>
+</html>

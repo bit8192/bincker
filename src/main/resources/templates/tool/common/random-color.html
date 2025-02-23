@@ -1,3 +1,4 @@
+<!--{"name":"随机颜色","description":"随机生成rgb颜色", "tags": ["随机"]}-->
 <!DOCTYPE html>
 <html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
 <head>
@@ -29,6 +30,17 @@
                 <div class="text-nowrap"><span id="text-color-default-with-alpha">#00000000</span><a href="javascript:void(0)" class="text-decoration-underline px-1 btn-copy-color"><i class="bi bi-copy"></i></a></div>
                 <div class="text-nowrap"><span id="text-color-rgba">rgba(0, 0, 0, 0)</span><a href="javascript:void(0)" class="text-decoration-underline px-1 btn-copy-color"><i class="bi bi-copy"></i></a></div>
             </div>
+        </div>
+        <hr class="mt-5" />
+        <div class="d-flex flex-row justify-content-around">
+            <div class="flex-grow-1 me-3">
+                <label for="input-contrast">对比度</label>
+                <input type="range" class="form-range" id="input-contrast" min="0" max="255" step="1" value="100" />
+            </div>
+            <button class="btn btn-lg btn-primary px-5" id="btn-generate-match-colors">生成配色</button>
+        </div>
+        <div class="d-flex flex-row">
+            <pre id="pre-match-colors"></pre>
         </div>
     </div>
 </main>
@@ -82,6 +94,50 @@
             const colorValue = "#" + color.concat().splice(0, 3).map(c=>numFormat(c)).join("");
             inputColor.val(colorValue);
             updateColor();
+        });
+
+        $("#btn-generate-match-colors").click(function () {
+            const contrastValue = parseInt($("#input-contrast").val());
+            if (!contrastValue) return;
+            const colorContrasts = {
+                "body-color": 0,
+                "body-bg": 0,
+                "secondary-color": 0,
+                "secondary-bg": 0,
+                "tertiary-color": 0,
+                "tertiary-bg": 0,
+                "emphasis-color": 0,
+                "primary-text": 0,
+                "secondary-text": 0,
+                "success-text": 0,
+                "info-text": 0,
+                "warning-text": 0,
+                "danger-text": 0,
+                "light-text": 0,
+                "dark-text": 0,
+                "primary-bg-subtle": 0,
+                "secondary-bg-subtle": 0,
+                "success-bg-subtle": 0,
+                "info-bg-subtle": 0,
+                "warning-bg-subtle": 0,
+                "danger-bg-subtle": 0,
+                "light-bg-subtle": 0,
+                "dark-bg-subtle": 0,
+                "primary-border-subtle": 0,
+                "secondary-border-subtle": 0,
+                "success-border-subtle": 0,
+                "info-border-subtle": 0,
+                "warning-border-subtle": 0,
+                "danger-border-subtle": 0,
+                "light-border-subtle": 0,
+                "dark-border-subtle": 0,
+                "heading-color": 0,
+                "link-color": 0,
+                "link-hover-color": 0,
+                "code-color": 0,
+                "border-color": 0,
+                "border-color-translucent": 0,
+            }
         });
     })();
 </script>

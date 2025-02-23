@@ -1,0 +1,121 @@
+<!--{"name":"二维码工具","description":"支持二维码解析和生成", "tags": ["二维码", "工具"]}-->
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>二维码工具</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.1/dist/easy.qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-reader@1.0.4/dist/index.min.js"></script>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+  <div class="row">
+    <div class="col-md-5">
+      <textarea id="qrText" class="form-control" rows="5" placeholder="输入要生成二维码的文本"></textarea>
+    </div>
+    <div class="col-md-2">
+      <button id="generateQR" class="btn btn-primary mt-3">生成二维码</button>
+      <button id="decodeQR" class="btn btn-primary mt-3">解析二维码</button>
+    </div>
+    <div class="col-md-5">
+      <label>
+        <input type="file" id="input" class="form-control d-none" accept="image/*">
+        <div id="qrCode" class="border border-info" style="min-width: 256px; min-height: 256px"></div>
+      </label>
+    </div>
+  </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+
+<script>
+    $(document).ready(function() {
+        // 生成二维码
+        $('#generateQR').click(function() {
+            var text = $('#qrText').val();
+            if (text) {
+                $('#qrCode').empty();
+                new QRCode(document.getElementById('qrCode'), {text});
+            } else {
+                alert('请输入要生成二维码的文本');
+            }
+        });
+
+        // 解析二维码
+        $('#decodeQR').click(function() {
+            const qr = new QrCode();
+            let canvas = $("#qrCode canvas");
+            if (!canvas.length) return;
+            canvas = canvas[0];
+            const context = canvas.getContext("2d");
+            qr.callback = function(error, value) {
+                if (error){
+                    console.error(error);
+                    alert("识别失败");
+                    return;
+                }
+                $('#qrText').val(value.result);
+            };
+            qr.decode(context.getImageData(0, 0, canvas.width, canvas.height));
+        });
+
+        //绘制文件图片
+        function drawFile(file) {
+            const reader = new FileReader(); // 创建FileReader对象
+            reader.onload = function (readerResult) {
+                const img = new Image(); // 创建Image对象
+                img.onload = function () {
+                    let canvas = $("#qrCode canvas");
+                    if (!canvas.length) {
+                        canvas = document.createElement("canvas");
+                        $("#qrCode").append(canvas);
+                    } else {
+                        canvas = canvas[0];
+                    }
+                    const ctx = canvas.getContext('2d');
+
+                    // 设置canvas的尺寸与图片一致
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    // 将图片绘制到canvas上
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                };
+                img.src = readerResult.target.result; // 设置Image对象的src为读取的文件数据
+            };
+            reader.readAsDataURL(file); // 读取文件内容为DataURL
+        }
+
+        //选择文件
+        $("#input").on("change", function(e){
+            const file = e.target.files[0]; // 获取用户选择的文件
+            if (file) {
+                drawFile(file);
+            }
+        });
+
+        //粘贴事件
+        document.addEventListener("paste", function(e) {
+            e.preventDefault();
+            const items = (e.clipboardData || window.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("text") !== -1){
+                    items[i].getAsString(function (text){
+                        $("#qrText").val(text);
+                    });
+                    break;
+                }
+                else if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile(); // 获取图片的Blob对象
+                    drawFile(file)
+                    break; // 只处理第一个图片
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

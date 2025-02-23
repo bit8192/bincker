@@ -1,10 +1,10 @@
-<!--{"name":"随机中文名","description":"随机生成中文名", "tags": ["随机"]}-->
+<!--{"name":"工具标题","description":"工具描述", "tags": ["标签"]}-->
 <!DOCTYPE html>
 <html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>随机中文名</title>
+    <title>工具标题</title>
     <th:block th:insert="~{common/basic :: css}"/>
     <th:block th:insert="~{common/basic :: js}"/>
 </head>

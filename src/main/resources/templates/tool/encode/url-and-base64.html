@@ -1,0 +1,57 @@
+<!--{"name":"常用编码工具","description":"支持URL编码解码和Base64编码解码的工具", "tags": ["编码", "解码", "工具"]}-->
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>常用编码工具</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+    <h1>常用编码工具</h1>
+    <p>这是一个支持URL编码解码和Base64编码解码的工具。</p>
+
+    <div class="mb-4">
+        <textarea id="input" class="form-control mb-2" rows="8" placeholder="请输入要编码或解码的内容..."></textarea>
+        <button onclick="encodeURL()" class="btn btn-primary">URL编码</button>
+        <button onclick="decodeURL()" class="btn btn-secondary">URL解码</button>
+        <button onclick="encodeBase64()" class="btn btn-primary">Base64编码</button>
+        <button onclick="decodeBase64()" class="btn btn-secondary">Base64解码</button>
+    </div>
+
+    <script>
+        function encodeURL() {
+            const input = document.getElementById('input').value;
+            document.getElementById('input').value = encodeURIComponent(input);
+        }
+
+        function decodeURL() {
+            const input = document.getElementById('input').value;
+            try {
+                document.getElementById('input').value = decodeURIComponent(input);
+            } catch (e) {
+                alert('URL解码失败，请输入有效的URL编码内容。');
+            }
+        }
+
+        function encodeBase64() {
+            const input = document.getElementById('input').value;
+            document.getElementById('input').value = btoa(input);
+        }
+
+        function decodeBase64() {
+            const input = document.getElementById('input').value;
+            try {
+                document.getElementById('input').value = atob(input);
+            } catch (e) {
+                alert('Base64解码失败，请输入有效的Base64编码内容。');
+            }
+        }
+    </script>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+</body>
+</html>
