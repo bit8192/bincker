@@ -4,22 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="修复工具页面错误BUG">
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/controller/ToolController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/entity/Tool.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/service/ToolService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/service/impl/ToolServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/encode/qrcode.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/encode/url-and-base64.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/template.html.tmp" afterDir="false" />
+    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="工具灵活调整，实现编码工具和二维码工具">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/common/controller/CommonToolController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/common/basic.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/common/basic.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-chinese-name.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-chinese-name.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-color.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-color.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-text.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/common/random-text.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/service/impl/ToolServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/tool/service/impl/ToolServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,37 +103,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Gradle.Build bincker.executor": "Run",
-    "Gradle.bincker [:bootJar].executor": "Run",
-    "Notification.DisplayName-DoNotAsk-Database detector": "Database detector",
-    "Notification.DoNotAsk-Database detector": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.BinckerApplication.executor": "Debug",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last.edited.regexp": "#000000",
-    "last_opened_file_path": "/home/bincker/IdeaProjects/bincker/src/main/resources/templates/tool",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Problems",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Gradle.Build bincker.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.bincker [:bootJar].executor&quot;: &quot;Run&quot;,
+    &quot;Notification.DisplayName-DoNotAsk-Database detector&quot;: &quot;Database detector&quot;,
+    &quot;Notification.DoNotAsk-Database detector&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.BinckerApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last.edited.regexp&quot;: &quot;#000000&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/bincker/IdeaProjects/bincker/src/main/resources/templates/tool&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Problems&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources/templates/tool" />
@@ -234,7 +221,8 @@
       <workItem from="1740204537397" duration="773000" />
       <workItem from="1740215691708" duration="1166000" />
       <workItem from="1740216874625" duration="6896000" />
-      <workItem from="1740285060811" duration="17004000" />
+      <workItem from="1740285060811" duration="18763000" />
+      <workItem from="1740401185238" duration="1977000" />
     </task>
     <task id="LOCAL-00001" summary="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
       <option name="closed" value="true" />
@@ -276,7 +264,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730828060739</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="工具灵活调整，实现编码工具和二维码工具">
+      <option name="closed" value="true" />
+      <created>1740314223458</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1740314223458</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -299,7 +295,8 @@
     <MESSAGE value="首页锁定焦点&#10;博客内容打开失败&#10;博客密码授权&#10;记住搜索引擎&#10;导航样式调整&#10;页面加载动画优化" />
     <MESSAGE value="blog同步脚本" />
     <MESSAGE value="修复工具页面错误BUG" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复工具页面错误BUG" />
+    <MESSAGE value="工具灵活调整，实现编码工具和二维码工具" />
+    <option name="LAST_COMMIT_MESSAGE" value="工具灵活调整，实现编码工具和二维码工具" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

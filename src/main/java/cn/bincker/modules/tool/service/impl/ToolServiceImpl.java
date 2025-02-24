@@ -39,8 +39,8 @@ public class ToolServiceImpl implements ToolService {
             resources = resolver.getResources(resourcePath);
             for (Resource resource : resources) {
                 try(var reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
-                    var uri = resource.getURI();
-                    var path = uri.getPath();
+                    var url = resource.getURL();
+                    var path = url.getPath();
                     path = path.substring(path.indexOf(TEMPLATE_PATH) + TEMPLATE_PATH.length());
                     if (path.equals("tool/index.html")) continue;//剔除首页
                     Tool tool = parseTool(reader.readLine());
