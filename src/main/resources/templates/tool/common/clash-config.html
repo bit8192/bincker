@@ -18,9 +18,12 @@
     <div>
         <label for="input-url">订阅连接</label>
         <div class="input-group">
-            <input id="input-url" class="form-control" placeholder="https://...">
+            <input id="input-url" class="form-control" placeholder="https://..." list="datalist-url">
             <button id="btn-read" class="btn btn-primary">读取</button>
+            <button id="btn-clear" class="btn btn-secondary">清空缓存</button>
         </div>
+        <datalist id="datalist-url">
+        </datalist>
     </div>
     <div>
         <label for="input-content">内容</label>
@@ -28,24 +31,67 @@
         <div class="py-1">
             <button id="btn-parse" class="btn btn-primary">解析</button>
             <button id="btn-copy" class="btn btn-link text-secondary">复制结果</button>
+            <button id="btn-down" class="btn btn-link text-secondary">保存下载</button>
         </div>
     </div>
     <pre id="pre-result"></pre>
     <script>
         $(function(){
+            const urlList = [];
+            const LS_URL_LIST = "tool.common.clash-config.url-list";
+            const datalistUrl = $("#datalist-url");
+
+            function initDatalistUrl() {
+                if (localStorage.getItem(LS_URL_LIST)) {
+                    urlList.splice(0);
+                    urlList.push(...JSON.parse(localStorage.getItem(LS_URL_LIST)));
+                    datalistUrl.empty();
+                    urlList.forEach(i=>{
+                        const option = document.createElement("option");
+                        option.value = i;
+                        datalistUrl.append(option)
+                    });
+                }
+            }
+
+            function saveUrlList() {
+                localStorage.setItem(LS_URL_LIST, JSON.stringify(urlList));
+            }
+
+            try {
+                initDatalistUrl();
+            }catch (ignore) {}
+
             const btnRead = $("#btn-read");
             btnRead.click(function(){
                 btnRead.attr("disabled", true);
-                $.get($("#input-url").val(), function(data, status){
+                const url = $("#input-url").val().trim();
+                if (!url){
+                    alert("地址为空！")
+                    return;
+                }
+                $.get(url, function(data, status){
+                    console.log(data,status);
                     btnRead.attr("disabled", false);
                     if (status === "success"){
                         $("#input-content").val(data);
+                        if(urlList.every(u=>u !== url)){
+                            urlList.push(url);
+                            saveUrlList();
+                        }
                     }
                 });
             });
 
+            $("#btn-clear").click(function(){
+                localStorage.removeItem(LS_URL_LIST);
+                datalistUrl.empty();
+                urlList.splice(0);
+            });
+
             const btnParse = $("#btn-parse");
             let result = [];
+            const LS_SECRET = "tool.common.clash-config.secret";
             btnParse.click(function(){
                 let content = $("#input-content").val();
                 if(!content) {
@@ -54,9 +100,13 @@
                 }
                 content = atob(content.trim());
                 const name = prompt("请输入配置名称", "Default");
+                let secret = localStorage.getItem(LS_SECRET);
+                if (!secret) {
+                    secret = prompt("请输入控制接口密钥", Math.abs(parseInt(Math.random()*10000000000)).toString(36));
+                    localStorage.setItem(LS_SECRET, secret);
+                }
                 result = content.split("\n").map(l=>l.trim()).filter(l=>!!l).map(ProxyUriUtils.parseUri);
-                const textResult = `
-mixed-port: 7890
+                const textResult = `mixed-port: 7890
 socks-port: 7891
 port: 7892
 allow-lan: false
@@ -65,7 +115,7 @@ log-level: info
 external-controller: 127.0.0.1:9090
 external-ui: ui
 external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
-secret: "${Math.abs(parseInt(Math.random()*10000000000)).toString(36)}"
+${secret ? "secret: \"" + secret + "\"" : ""}
 proxies:
 ${result.map(i=>"- " + JSON.stringify(i)).join("\n")}
 proxy-groups:
@@ -605,6 +655,16 @@ rules:
 
             $("#btn-copy").click(function (){
               navigator.clipboard.writeText($("#pre-result").text());
+            });
+
+            $("#btn-down").click(function(){
+                const blob = new Blob([$("#pre-result").text()], {type: "text/plain"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "config.yaml";
+                a.click();
+                a.remove();
             });
         });
     </script>
