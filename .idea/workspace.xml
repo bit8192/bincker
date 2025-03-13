@@ -4,9 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="添加Clash订阅转换工具">
+    <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="关于内容修改">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/common/DDL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/entity/Todo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/mapper/TodoMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/about.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/initialize.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/impl/BlogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/service/impl/BlogServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/blog/blog.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/blog/blog.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,11 +72,12 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
-        <option value="Class" />
         <option value="Thymeleaf" />
         <option value="HTML File" />
         <option value="JavaScript File" />
+        <option value="Class" />
+        <option value="AnnotationType" />
+        <option value="Interface" />
       </list>
     </option>
     <option name="SCHEME" value="Project" />
@@ -134,6 +143,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/opt/intellij-idea-ultimate-edition/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
+    ]
   }
 }</component>
   <component name="RecentsManager">
@@ -194,8 +208,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.24978.46" />
-        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-IU-243.24978.46" />
+        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.25659.59" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.25659.59" />
       </set>
     </attachedChunks>
   </component>
@@ -227,7 +241,9 @@
       <workItem from="1740285060811" duration="18763000" />
       <workItem from="1740401185238" duration="3014000" />
       <workItem from="1740485775460" duration="9497000" />
-      <workItem from="1740571453029" duration="2934000" />
+      <workItem from="1740571453029" duration="5587000" />
+      <workItem from="1741486063310" duration="8412000" />
+      <workItem from="1741864704941" duration="9419000" />
     </task>
     <task id="LOCAL-00001" summary="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
       <option name="closed" value="true" />
@@ -293,7 +309,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740506718734</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="关于内容修改">
+      <option name="closed" value="true" />
+      <created>1740574854527</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1740574854527</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -319,7 +343,8 @@
     <MESSAGE value="工具灵活调整，实现编码工具和二维码工具" />
     <MESSAGE value="修复工具枚举失败问题" />
     <MESSAGE value="添加Clash订阅转换工具" />
-    <option name="LAST_COMMIT_MESSAGE" value="添加Clash订阅转换工具" />
+    <MESSAGE value="关于内容修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="关于内容修改" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

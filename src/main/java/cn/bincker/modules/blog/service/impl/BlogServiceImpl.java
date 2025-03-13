@@ -206,7 +206,7 @@ public class BlogServiceImpl implements BlogService, ApplicationListener<Applica
         try {
             Files.walkFileTree(BLOG_DIR, new SimpleFileVisitor<>() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                public @NotNull FileVisitResult visitFile(Path file, @NotNull BasicFileAttributes attrs) {
                     try {
                         updateBlogFile(file.toFile());
                     } catch (Exception e) {
@@ -390,7 +390,7 @@ public class BlogServiceImpl implements BlogService, ApplicationListener<Applica
     @Override
     public void view(String path) {
         var blog = getByPath(path).orElseThrow();
-        blog.setLikes(blog.getLikes() + 1);
+        blog.setViews(blog.getViews() + 1);
         persistenceBlogMeta(blog);
     }
 

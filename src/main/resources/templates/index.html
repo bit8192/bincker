@@ -41,7 +41,8 @@
             </div>
             <div class="input-group input-group-lg">
                 <!--suppress HtmlFormInputWithoutLabel -->
-                <input class="form-control search-input" />
+                <input class="form-control search-input" list="search-data-list" />
+                <datalist id="search-data-list"></datalist>
                 <button id="search-button" class="btn btn-primary px-5">搜索</button>
             </div>
             <div>
@@ -70,6 +71,9 @@
         const searchEngineMap = searchEngines.reduce((acc, item) => (acc[item.key] = item, acc), {});
         let currentSearchEngines = +localStorage.getItem("searchEngines");
         if (isInvalidEngineIndex(currentSearchEngines)) currentSearchEngines = 0;
+
+        searchEngines.forEach(i=>$("#search-data-list").append($('<option value="' + i.key + ':" />')))
+
         const searchInput = $(".search-input");
         searchInput.focus();
 

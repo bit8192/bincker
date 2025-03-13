@@ -16,9 +16,14 @@
     <hr />
     <div class="text-secondary pb-3">
         <i class="bi bi-eye"></i>
+        <span th:text="${blog.getViews()}">0</span>
+        |
+        <a id="btn-like" class="icon-link icon-link-hover link-secondary text-decoration-none" href="javascript:void(0)" style="--bs-icon-link-transform: translate3d(0, -.25rem, 0);">
+            <i class="bi bi-heart"></i>
+        </a>
         <span th:text="${blog.getLikes()}">0</span>
         |
-        <a class="icon-link icon-link-hover link-secondary link-underline-secondary" href="javascript:void(0)" style="--bs-icon-link-transform: translate3d(0, -.25rem, 0);">
+        <a class="icon-link icon-link-hover link-secondary text-decoration-none" href="javascript:void(0)" style="--bs-icon-link-transform: translate3d(0, -.25rem, 0);">
             <i class="bi bi-share"></i>
         </a>
         <span th:text="${blog.getShares()}">0</span>
@@ -38,7 +43,22 @@
             contentType: "application/json",
             data: JSON.stringify({type: 'VIEW'})
         });
-    })()
+
+        $("#btn-like").click(function () {
+            if ($(this).children("i").hasClass("bi-heart-fill")) return;
+            console.log($(this))
+            $.post({
+                url: location.pathname,
+                contentType: "application/json",
+                data: JSON.stringify({type: 'LIKE'}),
+                success: ()=>{
+                    $(this).children("i").removeClass("bi-heart").addClass("bi-heart-fill");
+                    const span = $(this).next();
+                    span.text(+span.text() + 1);
+                }
+            });
+        })
+    })();
 </script>
 </body>
 </html>
