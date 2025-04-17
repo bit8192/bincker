@@ -13,4 +13,13 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="bincker" options="-parameters" />
+      <module name="bincker.aot" options="-parameters" />
+      <module name="bincker.aotTest" options="-parameters" />
+      <module name="bincker.main" options="-parameters" />
+      <module name="bincker.test" options="-parameters" />
+    </option>
+  </component>
 </project>

@@ -2,15 +2,12 @@ package cn.bincker.modules.todo.entity;
 
 import cn.bincker.common.DDL;
 import cn.bincker.common.entity.BaseEntity;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -20,7 +17,7 @@ import java.util.List;
         id unsigned bigint(20) primary key,
         created_time timestamp default current_timestamp,
         updated_time timestamp default current_timestamp,
-        deleted tinyint(1) default 0,
+        deleted boolean default 0,
         title varchar(255) default null,
         content text default null,
         priority integer default null,
@@ -28,9 +25,10 @@ import java.util.List;
         parentId bigint(20) default null,
         cyclic boolean default null,
         cycle varchar(255) default null,
+        procrastination_count int default 0,
         startTime timestamp default null,
         endTime timestamp default null,
-        consumedTimeList text default null,
+        is_chinese_calendar boolean default false,
         consumedTime unsigned bigint(20) default null
         );
         """)
@@ -65,6 +63,18 @@ public class Todo extends BaseEntity {
      */
     private String cycle;
     /**
+     * 取消次数
+     */
+    private Integer cancelledCount;
+    /**
+     * 完成次数
+     */
+    private Integer completedCount;
+    /**
+     * 拖延次数
+     */
+    private Integer procrastinationCount;
+    /**
      * 开始时间
      */
     private Date startTime;
@@ -73,10 +83,9 @@ public class Todo extends BaseEntity {
      */
     private Date endTime;
     /**
-     * 消耗时间列表
+     * 是否为农历时间
      */
-    @TableField(typeHandler = ConsumedTimeListTypeHandler.class)
-    private List<ConsumedTime> consumedTimeList;
+    private Boolean isChineseCalendar;
     /**
      * 消耗总时长
      */
@@ -93,21 +102,15 @@ public class Todo extends BaseEntity {
         NOT_STARTED(0, "未开始"),
         IN_PROGRESS(1, "进行中"),
         PAUSE(2, "暂停"),
-        COMPLETED(3, "已完成"),
-        CANCELLED(4, "已取消")
+        CANCEL_ONCE(3, "取消本次"),
+        CANCELLED(4, "已取消"),
+        COMPLETED(5, "已完成"),
         ;
         private final int value;
         private final String title;
         Status(int value, String title) {
             this.value = value;
             this.title = title;
-        }
-    }
-
-    public static class ConsumedTimeListTypeHandler extends JacksonTypeHandler {
-
-        public ConsumedTimeListTypeHandler(Class<?> clazz) throws NoSuchFieldException {
-            super(clazz, Todo.class.getDeclaredField("consumedTime"));
         }
     }
 }

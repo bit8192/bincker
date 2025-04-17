@@ -32,6 +32,7 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.7'
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+    implementation 'cn.6tail:lunar:1.7.2'
     runtimeOnly 'org.xerial:sqlite-jdbc:3.46.0.0'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
