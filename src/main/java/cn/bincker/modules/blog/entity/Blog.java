@@ -32,6 +32,7 @@ public class Blog {
 
     /**
      * 认证
+     * 格式：“账户名:密码”
      */
     private String authorization;
 
