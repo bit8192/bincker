@@ -13,6 +13,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "todo",autoResultMap = true)
 @DDL("""
+        drop table if exists todo;
         create table if not exists todo(
         id unsigned bigint(20) primary key,
         created_time timestamp default current_timestamp,
@@ -22,14 +23,16 @@ import java.util.Date;
         content text default null,
         priority integer default null,
         status int default null,
-        parentId bigint(20) default null,
+        parent_id bigint(20) default null,
         cyclic boolean default null,
         cycle varchar(255) default null,
+        completed_count int default 0,
+        cancelled_count int default 0,
         procrastination_count int default 0,
-        startTime timestamp default null,
-        endTime timestamp default null,
+        start_time timestamp default null,
+        end_time timestamp default null,
         is_chinese_calendar boolean default false,
-        consumedTime unsigned bigint(20) default null
+        consumed_time unsigned bigint(20) default null
         );
         """)
 public class Todo extends BaseEntity {
@@ -90,12 +93,6 @@ public class Todo extends BaseEntity {
      * 消耗总时长
      */
     private Long consumedTime;
-
-    @Data
-    public static class ConsumedTime {
-        private Date start;
-        private Long duration;
-    }
 
     @Getter
     public enum Status {

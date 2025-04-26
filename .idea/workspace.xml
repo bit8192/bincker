@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="86d8a00c-338c-4328-a494-7563f40a89d6" name="Changes" comment="完善部分todo内容">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/entity/Blog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/blog/entity/Blog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tool/common/clash-config.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tool/common/clash-config.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/controller/TodoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/controller/TodoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/entity/Todo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/entity/Todo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/service/impl/TodoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cn/bincker/modules/todo/service/impl/TodoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/todo/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/todo/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +90,7 @@
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/bit8192/bincker.git",
-    "accountId": "e9a62389-8b4c-49be-a072-c61b0cd519a9"
+    "accountId": "27b0f31e-ade4-4904-a20b-87310e61acff"
   }
 }]]></component>
   <component name="HighlightingSettingsPerFile">
@@ -303,6 +307,7 @@
       <workItem from="1744904351974" duration="6678000" />
       <workItem from="1744944860077" duration="1648000" />
       <workItem from="1745290764343" duration="3060000" />
+      <workItem from="1745671473001" duration="5329000" />
     </task>
     <task id="LOCAL-00001" summary="完成随机文本工具&#10;博客日志完全存储到文件&#10;cdn改为静态资源">
       <option name="closed" value="true" />

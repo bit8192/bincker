@@ -6,13 +6,315 @@
     <title>TODO</title>
     <th:block th:insert="~{common/basic :: css}"/>
     <th:block th:insert="~{common/basic :: js}"/>
+    <style>
+        .priority-high {
+            border-left: 4px solid #dc3545;
+        }
+        .priority-medium {
+            border-left: 4px solid #fd7e14;
+        }
+        .priority-low {
+            border-left: 4px solid #28a745;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .task-card {
+            transition: all 0.2s ease;
+        }
+        .task-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .completed-task {
+            opacity: 0.7;
+            background-color: #f8f9fa;
+        }
+        .cancelled-task {
+            opacity: 0.7;
+            background-color: #f8f9fa;
+            text-decoration: line-through;
+        }
+    </style>
 </head>
 <body>
 <th:block th:insert="~{common/basic :: nav}"/>
 <main class="container-xxl">
-    <ul class="p-3 list-unstyled">
-    </ul>
+    <!-- 统计信息 -->
+    <section class="row g-4 my-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">总任务数</h5>
+                            <h2 class="mb-0" th:text="${statistic.total}">0</h2>
+                        </div>
+                        <i class="bi bi-list-task fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">已完成</h5>
+                            <h2 class="mb-0" th:text="${statistic.completed}">0</h2>
+                        </div>
+                        <i class="bi bi-check-circle fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">拖延中</h5>
+                            <h2 class="mb-0" th:text="${statistic.procrastination}">0</h2>
+                        </div>
+                        <i class="bi bi-clock-history fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card stat-card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">已取消</h5>
+                            <h2 class="mb-0" th:text="${statistic.cancelled}">0</h2>
+                        </div>
+                        <i class="bi bi-x-circle fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 操作按钮 -->
+    <section class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>任务列表</h2>
+            <div>
+                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addTodoModal">
+                    <i class="bi bi-plus-lg"></i> 添加任务
+                </button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-filter"></i> 筛选
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">全部</a></li>
+                        <li><a class="dropdown-item" href="#">未开始</a></li>
+                        <li><a class="dropdown-item" href="#">进行中</a></li>
+                        <li><a class="dropdown-item" href="#">已完成</a></li>
+                        <li><a class="dropdown-item" href="#">已取消</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 任务列表 -->
+    <section>
+        <div class="row g-4" th:if="${#lists.isEmpty(list.records)}">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-check2-circle text-muted fs-1"></i>
+                        <h5 class="text-muted mt-3">暂无任务</h5>
+                        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addTodoModal">
+                            <i class="bi bi-plus-lg"></i> 添加第一个任务
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4" th:unless="${#lists.isEmpty(list.records)}">
+            <div class="col-md-6 col-lg-4" th:each="todo : ${list.records}">
+                <div class="card task-card h-100"
+                     th:classappend="${todo.status.value == 5} ? 'completed-task' :
+                    ${todo.status.value == 4} ? 'cancelled-task' :
+                    ${todo.priority == 1} ? 'priority-high' :
+                    ${todo.priority == 2} ? 'priority-medium' :
+                    ${todo.priority == 3} ? 'priority-low' : ''">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0" th:text="${todo.title}">任务标题</h5>
+                            <span class="badge"
+                                  th:classappend="
+                                  ${todo.status.value == 0} ? 'bg-secondary' :
+                                  ${todo.status.value == 1} ? 'bg-primary' :
+                                  ${todo.status.value == 2} ? 'bg-warning text-dark' :
+                                  ${todo.status.value == 3 || todo.status.value == 4} ? 'bg-danger' :
+                                  ${todo.status.value == 5} ? 'bg-success' : ''"
+                                  th:text="${todo.status.title}">状态</span>
+                        </div>
+                        <p class="card-text text-muted small" th:text="${todo.content} ?: '暂无描述'">任务描述</p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span class="badge bg-light text-dark me-1" th:if="${todo.cyclic}">
+                                    <i class="bi bi-arrow-repeat"></i> 循环
+                                </span>
+                                <span class="badge bg-light text-dark" th:if="${todo.startTime}">
+                                    <i class="bi bi-calendar"></i>
+                                    <span th:text="${#dates.format(todo.startTime, 'yyyy-MM-dd')}"></span>
+                                </span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                    操作
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" th:if="${todo.status.value != 5}"><i class="bi bi-check-circle"></i> 完成</a></li>
+                                    <li><a class="dropdown-item" href="#" th:if="${todo.status.value != 4}"><i class="bi bi-x-circle"></i> 取消</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> 编辑</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> 删除</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i>
+                            <span th:text="${#dates.format(todo.createTime, 'yyyy-MM-dd HH:mm')}"></span>
+                            <span class="ms-2" th:if="${todo.consumedTime}">
+                                <i class="bi bi-stopwatch"></i>
+                                <span th:text="${todo.consumedTime/3600000 + '小时'}"></span>
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 分页 -->
+    <section class="mt-4" th:if="${list.pages > 1}">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${list.current == 1} ? 'disabled' : ''">
+                    <a class="page-link" th:href="@{${'?page=' + (list.current - 1)}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(1, list.pages)}"
+                    th:classappend="${i == list.current} ? 'active' : ''">
+                    <a class="page-link" th:href="@{${'?page=' + i}}" th:text="${i}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${list.current == list.pages} ? 'disabled' : ''">
+                    <a class="page-link" th:href="@{${'?page=' + (list.current + 1)}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </section>
+
+    <!-- 添加任务模态框 -->
+    <div class="modal fade" id="addTodoModal" tabindex="-1" aria-labelledby="addTodoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTodoModalLabel">添加新任务</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="todoForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">标题</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">内容</label>
+                            <textarea class="form-control" id="content" rows="3"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">优先级</label>
+                                <select class="form-select" id="priority">
+                                    <option value="1">高</option>
+                                    <option value="2" selected>中</option>
+                                    <option value="3">低</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">状态</label>
+                                <select class="form-select" id="status">
+                                    <option value="0" selected>未开始</option>
+                                    <option value="1">进行中</option>
+                                    <option value="2">暂停</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="cyclic">
+                                    <label class="form-check-label" for="cyclic">
+                                        循环任务
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isChineseCalendar">
+                                    <label class="form-check-label" for="isChineseCalendar">
+                                        农历时间
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startTime" class="form-label">开始时间</label>
+                                <input type="datetime-local" class="form-control" id="startTime">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endTime" class="form-label">结束时间</label>
+                                <input type="datetime-local" class="form-control" id="endTime">
+                            </div>
+                        </div>
+                        <div class="mb-3" id="cycleInput" style="display: none;">
+                            <label for="cycle" class="form-label">循环周期</label>
+                            <input type="text" class="form-control" id="cycle" placeholder="例如: 1d 表示每天, 2w 表示每两周">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
+
+<script>
+    // 显示/隐藏循环周期输入框
+    document.getElementById('cyclic').addEventListener('change', function() {
+        document.getElementById('cycleInput').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // 这里可以添加更多的JavaScript交互逻辑
+    // 例如表单提交、任务状态变更等
+
+    // 初始化页面加载效果
+    document.addEventListener('DOMContentLoaded', function() {
+        // 可以在这里添加页面加载后的初始化逻辑
+    });
+</script>
 </body>
 </html>
