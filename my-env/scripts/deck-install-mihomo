@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -x
+
+download_latest(){
+  echo "get mihomo latest version tag..." >&2
+  tag="$(basename "$(curl -sI https://github.com/MetaCubeX/mihomo/releases/latest | grep location)" | tr -d '\r')"
+  if [ -z "$tag" ]; then
+    echo "get mihomo version tag failed." >&2
+    return 1
+  fi
+  echo "latest version tag: $tag" >&2
+  temp_file="$(mktemp "/tmp/mihomo-linux-arm64-$tag-XXX.gz")"
+  download_url="https://github.com/MetaCubeX/mihomo/releases/download/$tag/mihomo-linux-arm64-$tag.gz"
+  echo "downloading: $download_url" >&2
+  if ! curl -sL "$download_url" -o "$temp_file"; then
+    rm "$temp_file"
+    return 1
+  fi
+  echo "$temp_file"
+}
+
+install_pack(){
+  if [ ! -f /etc/os-release ] || ! head -n 1 /etc/os-release | grep -q SteamOS; then
+    echo "not in SteamOS."
+    return 1
+  fi
+
+  BIN_DIR="$HOME/.local/bin"
+
+  pack_file="$1"
+  if [ ! -f "$pack_file" ]; then
+    echo "file not exist: $pack_file"
+    return 1
+  fi
+  gzip -d "$pack_file" -c > "$BIN_DIR/mihomo"
+  rm "$pack_file"
+  chmod +x "$BIN_DIR/mihomo"
+  sudo steamos-readonly disable
+  echo "[Unit]
+Description=mihomo Daemon, Another Clash Kernel.
+After=network.target NetworkManager.service systemd-networkd.service iwd.service
+
+[Service]
+Type=simple
+LimitNPROC=500
+LimitNOFILE=1000000
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
+Restart=always
+ExecStartPre=/usr/bin/sleep 1s
+ExecStart=$BIN_DIR/mihomo -d $HOME/.config/mihomo
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+  " | sudo tee "/etc/systemd/system/mihomo.service"
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now mihomo.service
+  sudo steamos-readonly enable
+}
+
+install_latest() {
+  pack_file="$(download_latest)"
+  if [ -z "$pack_file" ]; then
+      return 1
+  fi
+  install_pack "$(download_latest)"
+}
+
+install_to_remote() {
+  DECK_IP="$1"
+  pack_file="$(download_latest)"
+  if [ -z "$pack_file" ]; then
+      return 1
+  fi
+  scp "$pack_file" "deck@$DECK_IP:$pack_file"
+  rm "$pack_file"
+  # shellcheck disable=SC2029
+  ssh -t "deck@$DECK_IP" "$(declare -f install_pack); install_pack $pack_file"
+}
+
+if [ -n "$1" ]; then
+  install_to_remote "$1"
+else
+  install_latest
+fi

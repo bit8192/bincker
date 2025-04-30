@@ -7,6 +7,9 @@ export MY_ENV
 source "$MY_ENV/update.sh"
 
 source "$MY_ENV/adb.sh"
+source "$MY_ENV/deck.sh"
 
 source "$MY_ENV/security/adb.sh"
+
+export PATH=$PATH:$MY_ENV/scripts
 
