@@ -1,11 +1,10 @@
 myenv_update() {
+  local LAST_CHECK_FILE="$MY_ENV/.last_update_available_check"
   _check_update_available(){
-    local LAST_CHECK_FILE="$MY_ENV/.last_update_available_check"
     local CHECK_INTERVAL=86400
     if [ ! -f "$LAST_CHECK_FILE" ] || [ $(($(date +%s) - $(date -r "$LAST_CHECK_FILE" +%s))) -gt $CHECK_INTERVAL ]; then
       cd "$MY_ENV/.." || return 1
       if git fetch --quiet 2>/dev/null; then
-        touch "$LAST_CHECK_FILE"
         if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
           return 0
         fi
@@ -24,6 +23,7 @@ myenv_update() {
       echo
       if [[ $REPLY =~ ^[Yy]$ ]] || [ -z "$REPLY" ]; then
         if git pull origin master; then
+          touch "$LAST_CHECK_FILE"
           source "$MY_ENV/bashrc.sh"
           echo "更新成功！"
         else
