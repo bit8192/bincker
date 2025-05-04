@@ -19,11 +19,11 @@ myenv_update() {
     git fetch
 
     if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
-      git diff --stat HEAD..origin/main
+      git diff --stat HEAD..origin/master
       read -p "MY_ENV有更新，是否进行更新？[Y/n] " -n 1 -r
       echo
       if [[ $REPLY =~ ^[Yy]$ ]] || [ -z "$REPLY" ]; then
-        if git pull origin main; then
+        if git pull origin master; then
           source "$MY_ENV/bashrc.sh"
           echo "更新成功！"
         else
