@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+get-mihomo-socks5-proxy() {
+  cfg_files=("$HOME/.config/clash/config.yaml" "$HOME/.config/mihomo/config.yaml" "/etc/mihomo/config.yaml" "/etc/clash/config.yaml" "/etc/clash-meta/config.yaml")
+  for cfg in "${cfg_files[@]}"; do
+    if [ -f "$cfg" ]; then
+      mihomo_cfg_file="$cfg"
+      break
+    fi
+  done
+
+  if [ -z "$mihomo_cfg_file" ] || [ ! -f "$mihomo_cfg_file" ]; then
+    echo "mihomo config file not found." >&2
+    return 1
+  fi
+
+  port="$(grep "mixed-port:" "$mihomo_cfg_file" | awk '{print $2}')"
+  if [ -z "$port" ]; then
+    port="$(grep "socks-port:" "$mihomo_cfg_file" | awk '{print $2}')"
+  fi
+  if [ -z "$port" ]; then
+    echo "port not found in config file: $mihomo_cfg_file" >&2
+    return 1
+  fi
+  echo "socks5://127.0.0.1:$port"
+}
+
+set-proxy() {
+  proxy="$(get-mihomo-socks5-proxy)"
+  set -x
+  export http_proxy="$proxy"
+  export HTTP_PROXY="$proxy"
+  export https_proxy="$proxy"
+  export HTTPS_PROXY="$proxy"
+  export ftp_proxy="$proxy"
+  export FTP_PROXY="$proxy"
+  export no_proxy="localhost,.local,.internal,127.0.0.1,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12"
+  set +x
+}
+
+# git
+if ! git config get --global http.https://github.com/.proxy > /dev/null; then
+  git config set --global http.https://github.com/.proxy "$(get-mihomo-socks5-proxy)"
+fi

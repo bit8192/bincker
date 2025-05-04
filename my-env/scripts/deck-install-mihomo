@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-set -x
 
 download_latest(){
   echo "get mihomo latest version tag..." >&2
-  tag="$(basename "$(curl -sI https://github.com/MetaCubeX/mihomo/releases/latest | grep location)" | tr -d '\r')"
+  tag="$(basename "$(curl -SsI https://github.com/MetaCubeX/mihomo/releases/latest | grep location)" | tr -d '\r')"
   if [ -z "$tag" ]; then
     echo "get mihomo version tag failed." >&2
     return 1
   fi
   echo "latest version tag: $tag" >&2
   temp_file="$(mktemp "/tmp/mihomo-linux-arm64-$tag-XXX.gz")"
-  download_url="https://github.com/MetaCubeX/mihomo/releases/download/$tag/mihomo-linux-arm64-$tag.gz"
+  download_url="https://github.com/MetaCubeX/mihomo/releases/download/$tag/mihomo-linux-amd64-$tag.gz"
   echo "downloading: $download_url" >&2
-  if ! curl -sL "$download_url" -o "$temp_file"; then
+  if ! curl -SsL "$download_url" -o "$temp_file"; then
     rm "$temp_file"
     return 1
   fi

@@ -4,7 +4,7 @@ myenv_update() {
     local CHECK_INTERVAL=86400
     if [ ! -f "$LAST_CHECK_FILE" ] || [ $(($(date +%s) - $(date -r "$LAST_CHECK_FILE" +%s))) -gt $CHECK_INTERVAL ]; then
       cd "$MY_ENV/.." || return 1
-      if git fetch --quiet; then
+      if git fetch --quiet 2>/dev/null; then
         touch "$LAST_CHECK_FILE"
         if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
           return 0
