@@ -39,6 +39,6 @@ set-proxy() {
 }
 
 # git
-if ! git config get --global http.https://github.com/.proxy > /dev/null; then
-  git config set --global http.https://github.com/.proxy "$(get-mihomo-socks5-proxy)"
+if ! git config --global --get http.https://github.com/.proxy > /dev/null; then
+  git config --global --add http.https://github.com/.proxy "$(get-mihomo-socks5-proxy)"
 fi
