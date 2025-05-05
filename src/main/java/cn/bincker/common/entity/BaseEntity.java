@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 @DDL("""
 create table if not exists base_entity(
-    id unsigned bigint(20) primary key,
+    id integer primary key autoincrement,
     created_time timestamp default current_timestamp,
     updated_time timestamp default current_timestamp,
     deleted boolean default 0

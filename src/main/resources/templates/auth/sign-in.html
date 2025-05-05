@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 - Bincker</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+    <style>
+        .login-container {
+            min-width: 720px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            background-color: var(--bs-body-bg);
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--bs-primary);
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .step {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: var(--bs-secondary-bg);
+            color: var(--bs-secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            font-weight: bold;
+        }
+
+        .step.active {
+            background-color: var(--bs-primary);
+            color: white;
+        }
+
+        .step.completed {
+            background-color: var(--bs-success);
+            color: white;
+        }
+
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background-color: var(--bs-secondary-bg);
+            margin: auto 0;
+            max-width: 2rem;
+        }
+
+        .step-connector.active {
+            background-color: var(--bs-primary);
+        }
+
+        .step-connector.completed {
+            background-color: var(--bs-success);
+        }
+
+        #step2 {
+            display: none;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--bs-secondary);
+        }
+
+        .login-footer a {
+            color: var(--bs-primary);
+            text-decoration: none;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+    <div class="d-flex align-items-center justify-content-center" style="min-height: calc(100vh - var(--navbar-height) - 10rem)">
+        <div class="login-container">
+            <h3 class="login-title">登录您的账户</h3>
+
+            <!-- 步骤指示器 -->
+            <div class="step-indicator">
+                <div class="step active" id="step1-indicator">1</div>
+                <div class="step-connector" id="connector1-2"></div>
+                <div class="step" id="step2-indicator">2</div>
+            </div>
+
+            <!-- 错误提示 -->
+            <div th:if="${param.get('error')}" class="alert alert-danger" th:text="${param.get('error')}"></div>
+
+            <!-- 第一步：用户名/密码 -->
+            <form id="step1" th:action="@{/auth/sign-in}" method="post">
+                <input type="hidden" name="step" value="1">
+
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="username" name="username"
+                           placeholder="用户名或邮箱" required autofocus>
+                    <label for="username">用户名或邮箱</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" name="password"
+                           placeholder="密码" required>
+                    <label for="password">密码</label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
+                    <label class="form-check-label" for="rememberMe">记住我</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">下一步</button>
+            </form>
+
+            <!-- 第二步：两步验证 -->
+            <form id="step2" th:action="@{/auth/sign-in-2fa}" method="post">
+                <input type="hidden" name="step" value="2">
+                <input type="hidden" name="remember-me" th:value="${rememberMe}">
+
+                <div class="mb-3 text-center">
+                    <p>请输入6位验证码完成登录</p>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="code" name="code"
+                           placeholder="验证码" required pattern="\d{6}" maxlength="6">
+                    <label for="code">验证码</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">登录</button>
+                <button type="button" id="backToStep1" class="btn btn-outline-secondary w-100 mt-2 py-2">返回</button>
+            </form>
+
+            <div class="login-footer">
+                <a href="/auth/forgot-password">忘记密码？</a>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+
+<script th:inline="javascript">
+    $(function() {
+        // 如果服务器返回的是第二步，则显示第二步表单
+        const isStep2 = /*[[${step == 2}]]*/ false;
+        if (isStep2) {
+            showStep2();
+        }
+
+        // 返回按钮事件
+        $('#backToStep1').click(function() {
+            showStep1();
+        });
+
+        // 验证码输入自动跳转
+        $('#code').on('input', function() {
+            if ($(this).val().length === 6) {
+                $('#step2').submit();
+            }
+        });
+    });
+
+    function showStep2() {
+        $('#step1').hide();
+        $('#step2').show();
+        $('#step1-indicator').removeClass('active').addClass('completed');
+        $('#step2-indicator').addClass('active');
+        $('#connector1-2').addClass('completed');
+        $('#verificationCode').focus();
+    }
+
+    function showStep1() {
+        $('#step2').hide();
+        $('#step1').show();
+        $('#step1-indicator').addClass('active').removeClass('completed');
+        $('#step2-indicator').removeClass('active');
+        $('#connector1-2').removeClass('completed');
+        $('#username').focus();
+    }
+</script>
+</body>
+</html>

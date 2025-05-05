@@ -15,7 +15,7 @@ import java.util.Date;
 @DDL("""
         drop table if exists todo;
         create table if not exists todo(
-        id unsigned bigint(20) primary key,
+        id integer primary key autoincrement,
         created_time timestamp default current_timestamp,
         updated_time timestamp default current_timestamp,
         deleted boolean default 0,

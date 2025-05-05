@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "todo_log", autoResultMap = true)
 @DDL("""
 create table if not exists todo_log(
-        id unsigned bigint(20) primary key,
+        id integer primary key autoincrement,
         created_time timestamp default current_timestamp,
         updated_time timestamp default current_timestamp,
         deleted tinyint(1) default 0,

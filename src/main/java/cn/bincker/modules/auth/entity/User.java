@@ -1,7 +1,9 @@
-package cn.bincker.common.entity;
+package cn.bincker.modules.auth.entity;
 
 import cn.bincker.common.DDL;
+import cn.bincker.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,35 +18,29 @@ import java.util.List;
 @DDL("""
 drop table if exists user;
 create table if not exists user(
-    id unsigned bigint(20) primary key,
+    id integer primary key autoincrement,
     created_time timestamp default current_timestamp,
     updated_time timestamp default current_timestamp,
     deleted boolean default 0,
     username varchar(32) unique not null,
-    password varchar(64)
+    email varchar(32) unique,
+    password varchar(64),
+    tfa_secret varchar(64)
 );
 """)
 public class User extends BaseEntity implements UserDetails {
     private String username;
     private String password;
+    private String email;
+    private String tfaSecret;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public String getTfaSecret() {
+        return tfaSecret;
     }
 }

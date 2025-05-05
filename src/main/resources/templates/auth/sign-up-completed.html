@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册成功 - Bincker</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.1/dist/easy.qrcode.min.js"></script>
+    <style>
+        .register-container {
+            min-width: 720px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            background-color: var(--bs-body-bg);
+        }
+
+        .register-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--bs-primary);
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--bs-secondary);
+        }
+
+        .register-footer a {
+            color: var(--bs-primary);
+            text-decoration: none;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+    <div class="d-flex align-items-center justify-content-center" style="min-height: calc(100vh - var(--navbar-height) - 10rem)">
+        <div class="register-container">
+            <h3 class="register-title">创建新账户成功</h3>
+
+            <!-- 错误提示 -->
+            <div class="alert alert-danger">本系统2FA是强制性的，请使用验证器扫描并记录您的两步验证码，否则您将无法登录</div>
+
+            <div id="qrCode" class="text-center"></div>
+            <h6 id="title-tfa-qrcode" class="text-break" th:text="${TFA_QRCODE}"></h6>
+
+            <div class="register-footer">
+                <a href="/auth/sign-in">立即登录</a>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+
+<script th:inline="javascript">
+    $(function() {
+        new QRCode(
+            document.getElementById('qrCode'),
+            {
+                text: $('#title-tfa-qrcode').text(),
+                width: 350,
+                height: 350,
+                onRenderingEnd: ()=>$("#qrCode>canvas").addClass("border")
+            }
+        );
+    });
+</script>
+</body>
+</html>

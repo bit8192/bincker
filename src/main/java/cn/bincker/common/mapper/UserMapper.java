@@ -1,6 +1,6 @@
 package cn.bincker.common.mapper;
 
-import cn.bincker.common.entity.User;
+import cn.bincker.modules.auth.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

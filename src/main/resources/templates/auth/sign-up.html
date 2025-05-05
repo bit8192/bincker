@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册 - Bincker</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+    <style>
+        .register-container {
+            min-width: 720px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            background-color: var(--bs-body-bg);
+        }
+
+        .register-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--bs-primary);
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--bs-secondary);
+        }
+
+        .register-footer a {
+            color: var(--bs-primary);
+            text-decoration: none;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            font-size: 0.875rem;
+            color: var(--bs-secondary);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+    <div class="d-flex align-items-center justify-content-center" style="min-height: calc(100vh - var(--navbar-height) - 10rem)">
+        <div class="register-container">
+            <h3 class="register-title">创建新账户</h3>
+
+            <!-- 错误提示 -->
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <form th:action="@{/auth/sign-up}" method="post">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="username" name="username"
+                           placeholder="用户名" required autofocus>
+                    <label for="username">用户名</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" name="email"
+                           placeholder="邮箱" required>
+                    <label for="email">邮箱</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" name="password"
+                           placeholder="密码" required>
+                    <label for="password">密码</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                           placeholder="确认密码" required>
+                    <label for="confirmPassword">确认密码</label>
+                </div>
+
+                <div class="password-requirements">
+                    <p>密码要求：</p>
+                    <ul>
+                        <li>至少8个字符</li>
+                        <li>包含大小写字母、数字、特殊符号等至少两种类型字符</li>
+                    </ul>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">注册</button>
+            </form>
+
+            <div class="register-footer">
+                已有账户？<a href="/auth/sign-in">立即登录</a>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+
+<script th:inline="javascript">
+    $(function() {
+        // 密码验证
+        $('#password, #confirmPassword').on('input', function() {
+            const password = $('#password').val();
+            const confirmPassword = $('#confirmPassword').val();
+
+            function isNotValidPassword(){
+                let types = 0;
+                if (password.match(/\d+/)) types ++;
+                if (password.match(/[a-z]+/)) types ++;
+                if (password.match(/[A-Z]+/)) types ++;
+                if (password.match(/[!@#$%^&*()_+\-=\[\]{}\\|;':",.<>/?`~]+/)) types ++;
+                if (password.match(/[^\w!@#$%^&*()_+\-=\[\]{}\\|;':",.<>/?`~]+/)) types ++;
+                return types < 2 || password.length < 8
+            }
+            if (isNotValidPassword()){
+                $('#password').addClass('is-invalid');
+            }else{
+                $('#password').removeClass('is-invalid');
+            }
+            if (password !== confirmPassword) {
+                $('#confirmPassword').addClass('is-invalid');
+            } else {
+                $('#confirmPassword').removeClass('is-invalid');
+            }
+        });
+    });
+</script>
+</body>
+</html>
