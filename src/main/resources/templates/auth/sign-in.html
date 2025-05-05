@@ -135,7 +135,7 @@
             <!-- 第二步：两步验证 -->
             <form id="step2" th:action="@{/auth/sign-in-2fa}" method="post">
                 <input type="hidden" name="step" value="2">
-                <input type="hidden" name="remember-me" th:value="${rememberMe}">
+                <input type="hidden" name="remember-me" th:value="${param.containsKey('remember-me')}">
 
                 <div class="mb-3 text-center">
                     <p>请输入6位验证码完成登录</p>

@@ -4,9 +4,9 @@ import cn.bincker.modules.auth.service.impl.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,11 +26,15 @@ import java.nio.charset.StandardCharsets;
 @EnableWebSecurity
 @Slf4j
 public class WebSecurityConfiguration {
+    private final UserService userDetailsService;
+
+    public WebSecurityConfiguration(@Lazy UserService userService) {
+        this.userDetailsService = userService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            UserService userDetailsService
+            HttpSecurity http
     ) throws Exception {
         return http
                 .authorizeHttpRequests(authorize->
@@ -50,17 +54,17 @@ public class WebSecurityConfiguration {
                         response.sendRedirect("/auth/sign-in?error=" + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8));
                     });
                 })
-                .authenticationManager(authenticationManager(userDetailsService))
+                .authenticationManager(authenticationManager())
                 .logout(logout->logout.logoutUrl("/auth/sign-out"))
-                .rememberMe(Customizer.withDefaults())
+                .rememberMe(rememberMe->rememberMe.rememberMeServices(rememberMeService()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterAt(twoFactorAuthenticationFilter(authenticationManager(userDetailsService)), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(twoFactorAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
     public TwoFactorAuthenticationSuccessHandler twoFactorAuthenticationHandler() {
-        return new TwoFactorAuthenticationSuccessHandler();
+        return new TwoFactorAuthenticationSuccessHandler(rememberMeService());
     }
 
     @Bean
@@ -69,8 +73,13 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    SecurityContextRepository securityContextRepository() {
+    public SecurityContextRepository securityContextRepository() {
         return new DelegatingSecurityContextRepository(new RequestAttributeSecurityContextRepository(), new HttpSessionSecurityContextRepository());
+    }
+
+    @Bean
+    public TwoFactorAuthenticationRememberMeService rememberMeService() {
+        return new TwoFactorAuthenticationRememberMeService(userDetailsService);
     }
 
     @Bean
@@ -79,15 +88,16 @@ public class WebSecurityConfiguration {
         filter.setAuthenticationDetailsSource(twoFactorAuthenticationDetailsSource());
         filter.setAuthenticationSuccessHandler(twoFactorAuthenticationHandler());
         filter.setSecurityContextRepository(securityContextRepository());
+        filter.setRememberMeServices(rememberMeService());
         return filter;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(UserService userService) {
+    public AuthenticationManager authenticationManager() {
         var usernamePasswordAuthenticationProvider = new TwoFactorUsernamePasswordAuthenticationProvider();
         usernamePasswordAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        usernamePasswordAuthenticationProvider.setUserDetailsService(userService);
-        var twoFactorAuthenticationProvider = new TwoFactorAuthenticationProvider(userService);
+        usernamePasswordAuthenticationProvider.setUserDetailsService(userDetailsService);
+        var twoFactorAuthenticationProvider = new TwoFactorAuthenticationProvider(userDetailsService);
         return new ProviderManager(usernamePasswordAuthenticationProvider, twoFactorAuthenticationProvider);
     }
 
