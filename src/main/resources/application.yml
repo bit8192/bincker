@@ -10,3 +10,6 @@ mybatis-plus:
   global-config:
     db-config:
       logic-delete-field: deleted
+server:
+  compression:
+    enabled: true

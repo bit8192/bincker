@@ -40,6 +40,7 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests(authorize->
                                 authorize
                                         .requestMatchers("/todo/**").authenticated()
+                                        .requestMatchers("/mihomo/**").authenticated()
                                         .requestMatchers("/auth/**").permitAll()
                                         .anyRequest().permitAll()
                 )
