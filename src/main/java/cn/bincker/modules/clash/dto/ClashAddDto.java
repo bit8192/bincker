@@ -1,9 +1,9 @@
-package cn.bincker.modules.mihomo.dto;
+package cn.bincker.modules.clash.dto;
 
 import lombok.Data;
 
 @Data
-public class MihomoAddDto {
+public class ClashAddDto {
     private String name;
     private String url;
 }

@@ -1,14 +1,14 @@
-package cn.bincker.modules.mihomo.controller;
+package cn.bincker.modules.clash.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("mihomo")
-public class MihomoController {
+@RequestMapping("clash")
+public class ClashController {
     @GetMapping
     public String index() {
-        return "mihomo/index";
+        return "clash/index";
     }
 }

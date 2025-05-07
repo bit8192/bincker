@@ -1,4 +1,4 @@
-package cn.bincker.modules.mihomo.entity;
+package cn.bincker.modules.clash.entity;
 
 import cn.bincker.common.DDL;
 import cn.bincker.common.entity.BaseEntity;
@@ -11,7 +11,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @DDL("""
-create table if not exists mihomo_subscribe(
+create table if not exists clash_subscribe(
     id integer primary key autoincrement,
     created_time timestamp default current_timestamp,
     updated_time timestamp default current_timestamp,
@@ -23,7 +23,7 @@ create table if not exists mihomo_subscribe(
     status tinyint(1) not null default 0
 );
 """)
-public class MihomoSubscribe extends BaseEntity {
+public class ClashSubscribe extends BaseEntity {
     private String name;
     private String url;
     private String content;

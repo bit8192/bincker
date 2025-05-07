@@ -12,16 +12,24 @@
 <body>
 <th:block th:insert="~{common/basic :: nav}"/>
 <main class="container-xxl p-5">
+    <h3>Clash代理配置转换</h3>
     <p>
         纯本地处理，不提交，不上传，放心使用
     </p>
-    <div>
+    <div class="pe-1">
         <label for="input-url">订阅连接</label>
         <div class="input-group">
             <input id="input-url" class="form-control" placeholder="https://..." list="datalist-url">
             <button id="btn-read" class="btn btn-primary">读取</button>
             <button id="btn-clear" class="btn btn-secondary">清空缓存</button>
         </div>
+        <span class="text-secondary" style="font-size: 0.8em">
+            若请求失败，可以手动使用curl请求：
+            <code id="code-curl">curl -H "User-Agent: Clash-Verge: v2.2.3" &lt;url&gt;</code>
+            <button class="btn btn-dark btn-outline-secondary ms-2" onclick="copyToClipboard(this)" style="font-size: 0.8em; --bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                <i class="bi bi-clipboard"></i> 复制
+            </button>
+        </span>
         <datalist id="datalist-url">
         </datalist>
     </div>
@@ -37,6 +45,17 @@
     <label for="textarea-result">结果</label>
     <textarea id="textarea-result" class="form-control" rows="20"></textarea>
     <script>
+        function copyToClipboard(button) {
+            const text = $(button).prev('code').text();
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = $(button).html();
+                $(button).html('<i class="bi bi-check"></i> 已复制');
+                setTimeout(() => {
+                    $(button).html(originalText);
+                }, 2000);
+            });
+        }
+
         $(function(){
             const urlList = [];
             const LS_URL_LIST = "tool.common.clash-config.url-list";
@@ -63,6 +82,10 @@
                 initDatalistUrl();
             }catch (ignore) {}
 
+            $("#input-url").on("change", function (e){
+                $("#code-curl").text("curl -H \"User-Agent: Clash-Verge: v2.2.3\" " + e.target.value);
+            });
+
             const btnRead = $("#btn-read");
             btnRead.click(function(){
                 btnRead.attr("disabled", true);
@@ -71,17 +94,64 @@
                     alert("地址为空！")
                     return;
                 }
-                $.get(url, function(data, status){
-                    console.log(data,status);
-                    btnRead.attr("disabled", false);
-                    if (status === "success"){
-                        $("#input-content").val(data);
-                        if(urlList.every(u=>u !== url)){
-                            urlList.push(url);
-                            saveUrlList();
-                        }
+                let headers = {"User-Agent": "Clash-Verge: v2.2.3"}
+                function complete(content){
+                    $("#input-content").val(content);
+                    if (urlList.every(u => u !== url)) {
+                        urlList.push(url);
+                        saveUrlList();
                     }
-                });
+                }
+                function doRequest() {
+                    if (fetch){
+                        fetch(url, {method: "GET", headers})
+                            .then(response=>{
+                                if (!response.ok) {
+                                    return Promise.reject("请求失败");
+                                }
+                                btnRead.attr("disabled", false);
+                                return response.text()
+                            })
+                            .then(complete)
+                            .catch((msg)=>{
+                                console.error("请求失败", msg);
+                                if (headers) {
+                                    headers = undefined;
+                                    doRequest();
+                                }else{
+                                    alert(typeof(msg) === "string" ? msg : "请求失败");
+                                    btnRead.attr("disabled", false);
+                                }
+                            });
+                    }else{
+                        $.ajax({
+                            url,
+                            headers,
+                            success(data, status) {
+                                if (status === "success") {
+                                    complete(data);
+                                }else{
+                                    if (headers) {
+                                        headers = undefined;
+                                        doRequest();
+                                    }else{
+                                        alert("请求失败");
+                                        btnRead.attr("disabled", false);
+                                    }
+                                }
+                            }
+                        }).fail(function () {
+                            if (headers) {
+                                headers = undefined;
+                                doRequest();
+                            }else{
+                                alert("请求失败");
+                                btnRead.attr("disabled", false);
+                            }
+                        });
+                    }
+                }
+                doRequest()
             });
 
             $("#btn-clear").click(function(){

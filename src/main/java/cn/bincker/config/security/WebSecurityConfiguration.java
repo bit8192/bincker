@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -99,7 +100,8 @@ public class WebSecurityConfiguration {
         usernamePasswordAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         usernamePasswordAuthenticationProvider.setUserDetailsService(userDetailsService);
         var twoFactorAuthenticationProvider = new TwoFactorAuthenticationProvider(userDetailsService);
-        return new ProviderManager(usernamePasswordAuthenticationProvider, twoFactorAuthenticationProvider);
+        var rememberMeAuthenticationProvider = new RememberMeAuthenticationProvider(rememberMeService().getKey());
+        return new ProviderManager(usernamePasswordAuthenticationProvider, twoFactorAuthenticationProvider, rememberMeAuthenticationProvider);
     }
 
     @Bean

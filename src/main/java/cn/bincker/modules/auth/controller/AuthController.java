@@ -7,6 +7,8 @@ import cn.bincker.modules.auth.service.impl.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,11 +42,11 @@ public class AuthController {
     }
 
     @GetMapping({"sign-in", "sign-in-2fa"})
-    public String signIn(HttpServletRequest request, Model model) {
+    public String signIn(HttpServletRequest request, Model model, @CurrentSecurityContext SecurityContext securityContext) {
         if (userService.countAll() < 1) return "redirect:/auth/sign-up";
         var step = request.getServletPath().endsWith("sign-in-2fa") ? 2 : 1;
         log.debug("step:{}, sessionId: {}", step, request.getSession().getId());
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var authentication = securityContext.getAuthentication();
         if (step == 1){
             if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
                 if (authentication.isAuthenticated()){
