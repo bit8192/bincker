@@ -30,13 +30,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-//    mybatis
+    // Jackson YAML
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    //    mybatis
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.11'
-//    markdown渲染
+    //    markdown渲染
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
-//    农历工具
+    //    农历工具
     implementation 'cn.6tail:lunar:1.7.2'
-//    双因素认证
+    //    双因素认证
     implementation 'com.warrenstrange:googleauth:1.5.0'
     runtimeOnly 'org.xerial:sqlite-jdbc:3.49.1.0'
     compileOnly 'org.projectlombok:lombok'
