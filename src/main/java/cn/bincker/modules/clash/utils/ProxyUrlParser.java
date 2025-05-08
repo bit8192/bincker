@@ -16,35 +16,20 @@ public class ProxyUrlParser {
 
     public static ProxyConfig parseUri(String uri) {
         String head = uri.split("://")[0];
-        switch (head) {
-            case "ss":
-                return uriSS(uri);
-            case "ssr":
-                return uriSSR(uri);
-            case "vmess":
-                return uriVMess(uri);
-            case "vless":
-                return uriVLess(uri);
-            case "trojan":
-                return uriTrojan(uri);
-            case "hysteria2":
-            case "hy2":
-                return uriHysteria2(uri);
-            case "hysteria":
-            case "hy":
-                return uriHysteria(uri);
-            case "tuic":
-                return uriTUIC(uri);
-            case "wireguard":
-            case "wg":
-                return uriWireguard(uri);
-            case "http":
-                return uriHTTP(uri);
-            case "socks5":
-                return uriSOCKS(uri);
-            default:
-                throw new IllegalArgumentException("Unknown uri type: " + head);
-        }
+        return switch (head) {
+            case "ss" -> uriSS(uri);
+            case "ssr" -> uriSSR(uri);
+            case "vmess" -> uriVMess(uri);
+            case "vless" -> uriVLess(uri);
+            case "trojan" -> uriTrojan(uri);
+            case "hysteria2", "hy2" -> uriHysteria2(uri);
+            case "hysteria", "hy" -> uriHysteria(uri);
+            case "tuic" -> uriTUIC(uri);
+            case "wireguard", "wg" -> uriWireguard(uri);
+            case "http" -> uriHTTP(uri);
+            case "socks5" -> uriSOCKS(uri);
+            default -> throw new IllegalArgumentException("Unknown uri type: " + head);
+        };
     }
 
     private static String getIfNotBlank(String ...values) {
@@ -67,14 +52,6 @@ public class ProxyUrlParser {
         return value != null;
     }
 
-    private static String trimStr(String str) {
-        return str != null ? str.trim() : str;
-    }
-
-    private static boolean isNotBlank(String name) {
-        return name != null && name.trim().length() > 0;
-    }
-
     private static boolean isIPv4(String address) {
         Pattern ipv4Regex = Pattern.compile("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$");
         return ipv4Regex.matcher(address).matches();
@@ -82,7 +59,11 @@ public class ProxyUrlParser {
 
     private static boolean isIPv6(String address) {
         Pattern ipv6Regex = Pattern.compile(
-                "^((?=.*(::))(?!.*\\3.+)(::)?)([0-9A-Fa-f]{1,4}(\\3|:\\b)|\\3){7}[0-9A-Fa-f]{1,4}$");
+                "^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|" +                 // 标准格式
+                        "^((?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?)::((?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?)$|" +  // 双冒号缩写
+                        "^(?:[0-9a-fA-F]{1,4}:){6}(?:[0-9]+\\.){3}[0-9]+$|" +          // IPv4映射的IPv6地址
+                        "^::(?:ffff:(?:[0-9]+\\.){3}[0-9]+)$"                        // 另一种IPv4映射格式
+        );
         return ipv6Regex.matcher(address).matches();
     }
 
@@ -513,13 +494,11 @@ public class ProxyUrlParser {
         proxy.setPort(port);
         proxy.setPrivateKey(privateKey);
 
-        Map<String, String> params = new HashMap<>();
         if (addons != null) {
             for (String addon : addons.split("&")) {
                 String[] keyValue = addon.split("=");
                 var key = keyValue[0].replace('_', '-');
                 var value = decodeURIComponent(keyValue[1]);
-                params.put(key, value);
                 switch (key) {
                     case "address":
                     case "ip":
@@ -558,10 +537,10 @@ public class ProxyUrlParser {
                         proxy.setDialerProxy(value);
                         break;
                     case "remote-dns-resolve":
-                        proxy["remote-dns-resolve"] = /(TRUE)|1/i.test(value);
+                        proxy.setRemoteDnsResolve(value != null && value.toUpperCase().matches("(TRUE)|1"));
                         break;
                     case "dns":
-                        proxy.dns = value.split(",");
+                        proxy.setDns(List.of(value.split(",")));
                         break;
                     default:
                         break;

@@ -64,8 +64,14 @@
                             <li><a class="dropdown-item" href="/game/">饥荒</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item" th:if="${@authUtils.authenticated()}">
-                        <a class="nav-link" href="/clash">Clash</a>
+                    <li class="nav-item dropdown" th:if="${@authUtils.authenticated()}">
+                        <a class="nav-link dropdown-toggle" href="/clash/subscribe" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Clash
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/clash/subscribe">订阅管理</a></li>
+                            <li><a class="dropdown-item" href="/clash/merge">合并管理</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">关于</a>

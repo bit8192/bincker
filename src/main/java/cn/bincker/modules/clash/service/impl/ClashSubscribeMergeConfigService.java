@@ -9,6 +9,7 @@ import cn.bincker.modules.clash.entity.config.ProxyGroupConfig;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMapper;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMergeConfigMapper;
 import cn.bincker.modules.clash.service.IClashSubscribeMergeConfigService;
+import cn.bincker.modules.clash.utils.ProxyUrlParser;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -20,17 +21,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -85,19 +88,25 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         List<ProxyConfig> allProxies = new ArrayList<>();
         for (var subscribe : clashSubscribes) {
             if (subscribe == null || subscribe.getUrl() == null) continue;
-            String yaml = readUrlContent(subscribe.getUrl());
-            ClashConfig config = yamlMapper.readValue(yaml, ClashConfig.class);
-            if (config.getProxies() != null) allProxies.addAll(config.getProxies());
+            try {
+                allProxies.addAll(Objects.requireNonNull(readSubscribe(subscribe)));
+                subscribe.setStatus(ClashSubscribe.Status.NORMAL);
+                subscribe.setLastUpdateTime(new Date());
+            } catch (Exception e) {
+                log.error("merge clash subscribe error. id={}", subscribe.getId(), e);
+                subscribe.setStatus(ClashSubscribe.Status.ABNORMAL);
+            }
+            clashSubscribeMapper.updateById(subscribe);
         }
         // 筛选proxies
         List<ProxyConfig> filtered = allProxies;
         if (mergeConfig.getTypeRegex() != null && !mergeConfig.getTypeRegex().isEmpty()) {
             Pattern typePattern = Pattern.compile(mergeConfig.getTypeRegex());
-            filtered = filtered.stream().filter(p -> p.getType() != null && typePattern.matcher(p.getType()).find()).collect(Collectors.toList());
+            filtered = filtered.stream().filter(p -> p.getType() != null && typePattern.matcher(p.getType()).find()).toList();
         }
         if (mergeConfig.getNameRegex() != null && !mergeConfig.getNameRegex().isEmpty()) {
             Pattern namePattern = Pattern.compile(mergeConfig.getNameRegex());
-            filtered = filtered.stream().filter(p -> p.getName() != null && namePattern.matcher(p.getName()).find()).collect(Collectors.toList());
+            filtered = filtered.stream().filter(p -> p.getName() != null && namePattern.matcher(p.getName()).find()).toList();
         }
         // 构造新的ClashConfig
         ClashConfig override = mergeConfig.getOverrideConfig() != null && !mergeConfig.getOverrideConfig().isEmpty()
@@ -108,11 +117,32 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         if (override.getProxyGroups() == null || override.getProxyGroups().isEmpty()) {
             override.setProxyGroups(defaultProxyGroups(filtered));
         }
+        if (override.getRules() == null || override.getRules().isEmpty()) {
+            override.setRules(defaultRules());
+        }
         // 序列化回YAML
         String newYaml = yamlMapper.writeValueAsString(override);
         mergeConfig.setOverrideConfig(newYaml);
         mergeConfig.setLatestMergeTime(new Date());
         clashSubscribeMergeConfigMapper.updateById(mergeConfig);
+    }
+
+    private List<String> defaultRules() {
+        return List.of(
+                "DOMAIN-SUFFIX,local,DIRECT",
+                "IP-CIDR,127.0.0.0/8,DIRECT",
+                "IP-CIDR,172.16.0.0/12,DIRECT",
+                "IP-CIDR,192.168.0.0/16,DIRECT",
+                "IP-CIDR,10.0.0.0/8,DIRECT",
+                "IP-CIDR,17.0.0.0/8,DIRECT",
+                "IP-CIDR,100.64.0.0/10,DIRECT",
+                "IP-CIDR,224.0.0.0/4,DIRECT",
+                "IP-CIDR6,fe80::/10,DIRECT",
+                "DOMAIN-SUFFIX,cn,DIRECT",
+                "DOMAIN-KEYWORD,-cn,DIRECT",
+                "GEOIP,CN,DIRECT",
+                "MATCH,Default"
+        );
     }
 
     private List<ProxyGroupConfig> defaultProxyGroups(List<ProxyConfig> proxies) {
@@ -127,17 +157,61 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         auto.setName("Auto");
         auto.setType("url-test");
         auto.setProxies(proxyNames);
-        auto.setUrl("http://www.gstatic.com/generate_204");
+        auto.setUrl("https://www.gstatic.com/generate_204");
         auto.setInterval(300);
         groups.add(auto);
         return groups;
     }
 
-    private String readUrlContent(String url) throws IOException {
-        try (java.util.Scanner scanner = new java.util.Scanner(new URL(url).openStream(), StandardCharsets.UTF_8)) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
+    private List<ProxyConfig> readSubscribe(ClashSubscribe subscribe) throws IOException, InterruptedException {
+        var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(subscribe.getUrl()))
+                .header("User-Agent", "Clash-Verge: v2.2.3")
+                .build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var content = response.body();
+        response.headers().firstValue("subscription-userinfo").ifPresent(userinfo->{
+            var params = Stream.of(userinfo.split(";"))
+                    .map(item->{
+                        var keyValue = item.split("=");
+                        return Map.entry(keyValue[0].trim(), Long.parseLong(keyValue[1].trim()));
+                    })
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Optional.ofNullable(params.get("upload")).ifPresent(subscribe::setUploadTraffic);
+            Optional.ofNullable(params.get("download")).ifPresent(subscribe::setDownloadTraffic);
+            Optional.ofNullable(params.get("total")).ifPresent(subscribe::setTotalTraffic);
+            Optional.ofNullable(params.get("expire")).ifPresent(expire->subscribe.setExpiredTime(new Date(expire * 1000L)));
+        });
+        if (content == null) return null;
+        if (content.matches("^([a-zA-Z0-9/=]{4})+$")){
+            return parseBase64Content(subscribe, content);
         }
+        ClashConfig config = yamlMapper.readValue(content, ClashConfig.class);
+        var proxies = config.getProxies();
+        if (proxies == null || proxies.isEmpty()) return Collections.emptyList();
+        if (subscribe.getSkipProxies() != null && subscribe.getSkipProxies() < proxies.size()) {
+            proxies = proxies.subList(subscribe.getSkipProxies(), proxies.size());
+        }
+        return proxies;
+    }
+
+    private List<ProxyConfig> parseBase64Content(ClashSubscribe subscribe, String content) {
+        content = new String(Base64.getDecoder().decode(content), StandardCharsets.UTF_8);
+        return Stream.of(content.split("\n"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(line->{
+                    try {
+                        return ProxyUrlParser.parseUri(line);
+                    }catch (Exception e){
+                        log.error("parse url fail. content={}", line, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .skip(subscribe.getSkipProxies() == null ? 0 : subscribe.getSkipProxies())
+                .toList();
     }
 
     @Override

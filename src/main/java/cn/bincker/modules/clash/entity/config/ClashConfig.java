@@ -123,7 +123,7 @@ public class ClashConfig {
     @JsonProperty("rule-providers")
     private Map<String, RuleProviderConfig> ruleProviders;
     
-    private List<Object> rules;
+    private List<String> rules;
     
     @JsonProperty("sub-rules")
     private Map<String, List<Object>> subRules;

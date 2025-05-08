@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clash 订阅管理</title>
+    <th:block th:insert="~{common/basic :: css}"/>
+    <th:block th:insert="~{common/basic :: js}"/>
+    <style>
+    </style>
+</head>
+<body>
+<th:block th:insert="~{common/basic :: nav}"/>
+<main class="container-xxl p-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Clash 订阅管理</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubscriptionModal">
+            <i class="bi bi-plus-lg"></i> 添加订阅
+        </button>
+    </div>
+
+    <table class="table" style="table-layout: fixed">
+        <colgroup>
+            <col>
+            <col>
+            <col style="width: 60%">
+            <col style="width: 9em">
+            <col>
+            <col>
+        </colgroup>
+        <thead>
+        <tr>
+            <th class="text-nowrap">ID</th>
+            <th class="text-nowrap">名称</th>
+            <th class="text-nowrap">url</th>
+            <th class="text-nowrap">更新时间</th>
+            <th class="text-nowrap">剩余流量</th>
+            <th class="text-nowrap">状态</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${page.records}">
+            <td th:text="${row.id}"></td>
+            <td th:text="${row.name}"></td>
+            <td class="text-truncate" th:text="${row.url}"></td>
+            <td class="text-nowrap" th:text="${#dates.format(row.lastUpdateTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${( row.totalTraffic - row.downloadTraffic - row.uploadTraffic ) / 1024 / 1024 } + 'GB'"></td>
+            <td th:text="${row.status}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 添加订阅模态框 -->
+    <div class="modal fade" id="addSubscriptionModal" tabindex="-1" aria-labelledby="addSubscriptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSubscriptionModalLabel">添加订阅</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSubscriptionForm" method="post" th:action="@{/clash/subscribe}">
+                        <div class="mb-3">
+                            <label for="subscriptionName" class="form-label">订阅名称</label>
+                            <input type="text" name="name" class="form-control" id="subscriptionName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subscriptionUrl" class="form-label">订阅URL</label>
+                            <input type="url" name="url" class="form-control" id="subscriptionUrl" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="skipProxies" class="form-label">跳过前N个代理</label>
+                            <input type="number" min="0" max="128" name="skipProxies" class="form-control" id="skipProxies">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveSubscription">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:insert="~{common/basic :: footer}"/>
+
+<script>
+    $(document).ready(function() {
+        // 添加订阅表单提交
+        $('#saveSubscription').click(function() {
+            const name = $('#subscriptionName').val();
+            const url = $('#subscriptionUrl').val();
+
+            if (!name || !url) {
+                alert('请填写订阅名称和URL');
+                return;
+            }
+
+            $('#addSubscriptionForm').submit();
+        });
+    });
+</script>
+</body>
+</html>
