@@ -1,4 +1,4 @@
-package cn.bincker.modules.clash.entity;
+package cn.bincker.modules.clash.entity.config;
 
 import lombok.Data;
 import java.util.List;

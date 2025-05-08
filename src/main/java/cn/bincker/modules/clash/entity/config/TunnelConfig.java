@@ -1,4 +1,4 @@
-package cn.bincker.modules.clash.entity;
+package cn.bincker.modules.clash.entity.config;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

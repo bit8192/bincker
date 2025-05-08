@@ -1,5 +1,6 @@
 package cn.bincker.modules.clash.entity;
 
+import cn.bincker.modules.clash.entity.config.ClashConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;

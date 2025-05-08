@@ -19,6 +19,7 @@ create table if not exists clash_subscribe(
     name varchar(64) not null,
     url varchar(1024) not null,
     content text,
+    skip_proxies integer,
     last_update_time timestamp default current_timestamp,
     status tinyint(1) not null default 0
 );
@@ -27,6 +28,7 @@ public class ClashSubscribe extends BaseEntity {
     private String name;
     private String url;
     private String content;
+    private Integer skipProxies;
     private Date lastUpdateTime;
     private Status status;
 

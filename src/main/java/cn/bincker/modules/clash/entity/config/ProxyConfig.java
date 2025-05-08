@@ -1,4 +1,4 @@
-package cn.bincker.modules.clash.entity;
+package cn.bincker.modules.clash.entity.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -12,6 +12,7 @@ public class ProxyConfig {
     private String type;
     private String server;
     private Integer port;
+    private String ports;
     private String username;
     private String password;
     private Boolean tls;
@@ -22,7 +23,7 @@ public class ProxyConfig {
     @JsonProperty("ip-version")
     private String ipVersion;
     private String sni;
-    private String alpn;
+    private List<String> alpn;
     private String uuid;
     private Integer alterId;
     private String cipher;
@@ -99,6 +100,11 @@ public class ProxyConfig {
     @JsonProperty("udp-relay-mode")
     private String udpRelayMode;
     private String transport;
+    @JsonProperty("heartbeat-interval")
+    private Integer heartbeatInterval;
+    @JsonProperty("max-open-streams")
+    private Integer maxOpenStreams;
+    private Integer mtu;
 }
 
 @Data
@@ -143,9 +149,3 @@ class SmuxConfig {
     private Boolean onlyTcp = false;
 }
 
-class RealityOpts {
-    @JsonProperty("public-key")
-    private String publicKey;
-    @JsonProperty("short-id")
-    private String shortId;
-}
