@@ -10,6 +10,9 @@ import cn.bincker.modules.clash.mapper.ClashSubscribeMapper;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMergeConfigMapper;
 import cn.bincker.modules.clash.service.IClashSubscribeMergeConfigService;
 import cn.bincker.modules.clash.utils.ProxyUrlParser;
+import cn.bincker.modules.clash.vo.ClashSubscribeMergeConfigDetailVo;
+import cn.bincker.modules.clash.vo.ClashSubscribeMergeConfigVo;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -116,6 +119,16 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         // proxyGroups
         if (override.getProxyGroups() == null || override.getProxyGroups().isEmpty()) {
             override.setProxyGroups(defaultProxyGroups(filtered));
+        }else{
+            var proxyGroups = override.getProxyGroups();
+            var proxyNames = filtered.stream().map(ProxyConfig::getName).toList();
+            proxyGroups.get(0).setProxies(
+                    Stream.concat(
+                            proxyGroups.stream().skip(1L).map(ProxyGroupConfig::getName),
+                            proxyNames.stream()
+                    ).toList()
+            );
+            proxyGroups.stream().skip(1).forEach(group->group.setProxies(proxyNames));
         }
         if (override.getRules() == null || override.getRules().isEmpty()) {
             override.setRules(defaultRules());
@@ -160,6 +173,13 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         auto.setUrl("https://www.gstatic.com/generate_204");
         auto.setInterval(300);
         groups.add(auto);
+        ProxyGroupConfig fallback = new ProxyGroupConfig();
+        fallback.setName("Fallback");
+        fallback.setType("fallback");
+        fallback.setProxies(proxyNames);
+        fallback.setUrl("https://www.gstatic.com/generate_204");
+        fallback.setInterval(7200);
+        groups.add(fallback);
         return groups;
     }
 
@@ -215,10 +235,48 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
     }
 
     @Override
-    public Page<ClashSubscribeMergeConfig> page(ClashSubscribeMergeConfigDto dto, Page<ClashSubscribeMergeConfig> page) {
-        return clashSubscribeMergeConfigMapper.selectPage(page, new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ClashSubscribeMergeConfig>()
+    public Page<ClashSubscribeMergeConfigVo> page(ClashSubscribeMergeConfigDto dto, Page<ClashSubscribeMergeConfig> page) {
+        var result = clashSubscribeMergeConfigMapper.selectPage(page, new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ClashSubscribeMergeConfig>()
                 .like(dto.getName() != null, "name", dto.getName())
         );
+        var voPage = new Page<ClashSubscribeMergeConfigVo>(result.getCurrent(), result.getSize(), result.getTotal());
+        Map<Long, ClashSubscribe> subscribeMap;
+        if (result.getRecords().stream().anyMatch(item->"all".equalsIgnoreCase(item.getSubscribeIds()))){
+            subscribeMap = clashSubscribeMapper.selectList(Wrappers.emptyWrapper())
+                    .stream()
+                    .collect(Collectors.toMap(ClashSubscribe::getId, a->a));
+        }else{
+            subscribeMap = clashSubscribeMapper.selectByIds(
+                            result.getRecords().stream().map(item->Stream.of(item.getSubscribeIds().split(",")).map(Long::valueOf).toList())
+                                    .reduce(new ArrayList<Long>(), (a,b)->{
+                                        a.addAll(b);
+                                        return a;
+                                    })
+                    )
+                    .stream()
+                    .collect(Collectors.toMap(ClashSubscribe::getId, a->a));
+        }
+        voPage.setRecords(
+                result.getRecords().stream()
+                        .map(item->{
+                            var vo = new ClashSubscribeMergeConfigVo();
+                            BeanUtils.copyProperties(item, vo);
+                            Collection<ClashSubscribe> subscribes;
+                            if ("all".equalsIgnoreCase(item.getSubscribeIds())){
+                                subscribes = subscribeMap.values();
+                            }else{
+                                subscribes = Stream.of(item.getSubscribeIds().split(",")).map(subscribeMap::get)
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toList());
+                            }
+                            vo.setDownloadTraffic(subscribes.stream().mapToLong(ClashSubscribe::getDownloadTraffic).sum());
+                            vo.setUploadTraffic(subscribes.stream().mapToLong(ClashSubscribe::getUploadTraffic).sum());
+                            vo.setTotalTraffic(subscribes.stream().mapToLong(ClashSubscribe::getTotalTraffic).sum());
+                            return vo;
+                        })
+                        .toList()
+        );
+        return voPage;
     }
 
     @Override
@@ -251,4 +309,25 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
     public void delete(Long id) {
         clashSubscribeMergeConfigMapper.deleteById(id);
     }
-} 
+
+    @Override
+    public ClashSubscribeMergeConfigDetailVo getDetailById(Long id) {
+        var target = clashSubscribeMergeConfigMapper.selectById(id);
+        var vo = new ClashSubscribeMergeConfigDetailVo();
+        BeanUtils.copyProperties(target, vo);
+        List<ClashSubscribe> subscribes;
+        if ("all".equalsIgnoreCase(target.getSubscribeIds())) {
+            subscribes = clashSubscribeMapper.selectList(Wrappers.emptyWrapper());
+        }else{
+            subscribes = clashSubscribeMapper.selectByIds(
+                    Stream.of(target.getSubscribeIds().split(",")).map(Long::valueOf).toList()
+            );
+        }
+        if (subscribes.size() > 3) {
+            vo.setSubscribeNames(subscribes.subList(0, 3).stream().map(ClashSubscribe::getName).collect(Collectors.joining("、")) + "等" + subscribes.size() + "个订阅");
+        }else{
+            vo.setSubscribeNames(subscribes.stream().map(ClashSubscribe::getName).collect(Collectors.joining("、")));
+        }
+        return null;
+    }
+}
