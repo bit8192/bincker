@@ -704,7 +704,7 @@ $(function() {
             .then(response => response.json())
             .then(data => {
                 $("#addMergeForm").attr("method", "put");
-                $("#addMergeForm").attr("th:action", "/clash/merge");
+                $("#addMergeForm").attr("action", "/clash/merge");
                 $("#mergeName").val(data.name);
                 $("#overrideConfig").val(data.overrideConfig);
                 $("#limitDelay").val(data.limitDelay);
