@@ -8,6 +8,7 @@ import cn.bincker.modules.clash.service.IClashSubscribeMergeConfigService;
 import cn.bincker.modules.clash.service.IClashSubscribeService;
 import cn.bincker.modules.clash.vo.ClashSubscribeMergeConfigDetailVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -67,6 +68,13 @@ public class ClashController {
         return ResponseEntity.ok(detail);
     }
 
+    @GetMapping(value = "merge/{id}/token")
+    public ResponseEntity<String> getToken(@PathVariable Long id) {
+        var token = clashSubscribeMergeConfigService.getTokenById(id);
+        if (token == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(token);
+    }
+
     @PostMapping("merge")
     public String addMerge(@Validated ClashSubscribeMergeConfigDto dto) {
         clashSubscribeMergeConfigService.add(dto);
@@ -85,9 +93,19 @@ public class ClashController {
     }
 
     @GetMapping("config.yaml")
-    public ResponseEntity<String> downloadConfig(@RequestParam String token) {
-        var merge = clashSubscribeMergeConfigService.getByToken(token);
-        if (merge == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(merge.getLatestMergeContent());
+    public ResponseEntity<String> downloadConfig(@RequestParam String token, HttpServletResponse response) {
+        var target = clashSubscribeMergeConfigService.getContent(token);
+        if (target == null) return ResponseEntity.notFound().build();
+        response.setHeader(
+                "subscription-userinfo",
+                String.format(
+                        "download=%d; upload=%d; total=%d; expire=%d",
+                        target.getDownloadTraffic(),
+                        target.getUploadTraffic(),
+                        target.getTotalTraffic(),
+                        target.getExpire()
+                )
+        );
+        return ResponseEntity.ok(target.getContent());
     }
 }

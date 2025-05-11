@@ -1,4 +1,4 @@
-package cn.bincker.bincker;
+package cn.bincker;
 
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.parser.Parser;

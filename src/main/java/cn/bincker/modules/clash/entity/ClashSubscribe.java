@@ -39,7 +39,7 @@ public class ClashSubscribe extends BaseEntity {
     private String content;
     private Integer skipProxies;
     private Date lastUpdateTime;
-    @TableField(typeHandler = EnumOrdinalTypeHandler.class)
+    @TableField(typeHandler = EnumOrdinalTypeHandler.class, javaType = true)
     private Status status;
     private Long downloadTraffic;
     private Long uploadTraffic;

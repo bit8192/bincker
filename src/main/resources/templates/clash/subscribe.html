@@ -44,7 +44,7 @@
             <td th:text="${row.name}"></td>
             <td class="text-truncate" th:text="${row.url}"></td>
             <td class="text-nowrap" th:text="${#dates.format(row.lastUpdateTime, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:text="${( row.totalTraffic - row.downloadTraffic - row.uploadTraffic ) / 1024 / 1024 } + 'GB'"></td>
+            <td th:text="${( row.totalTraffic - row.downloadTraffic - row.uploadTraffic ) / 1024 / 1024 / 1024 } + 'GB'"></td>
             <td th:text="${row.status}"></td>
         </tr>
         </tbody>

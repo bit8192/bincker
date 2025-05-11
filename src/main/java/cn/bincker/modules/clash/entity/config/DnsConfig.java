@@ -44,12 +44,3 @@ public class DnsConfig {
     private Map<String, Object> nameserverPolicy;
 }
 
-@Data
-class FallbackFilterConfig {
-    private Boolean geoip;
-    @JsonProperty("geoip-code")
-    private String geoipCode;
-    private List<String> geosite;
-    private List<String> ipcidr;
-    private List<String> domain;
-} 

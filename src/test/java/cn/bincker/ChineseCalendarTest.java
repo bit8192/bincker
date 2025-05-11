@@ -1,4 +1,4 @@
-package cn.bincker.bincker;
+package cn.bincker;
 
 import cn.bincker.modules.todo.service.impl.TodoService;
 import org.junit.jupiter.api.Test;
