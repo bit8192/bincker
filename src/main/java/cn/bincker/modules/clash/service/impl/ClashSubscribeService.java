@@ -39,7 +39,7 @@ public class ClashSubscribeService implements IClashSubscribeService {
         Assert.notNull(dto, "参数不能为空");
         Assert.notNull(dto.getName(), "名称不能为空");
         // 这里只以name为唯一标识，实际可根据id等主键
-        ClashSubscribe entity = clashSubscribeMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ClashSubscribe>().eq("name", dto.getName()));
+        ClashSubscribe entity = clashSubscribeMapper.selectById(dto.getId());
         if (entity == null) throw new IllegalArgumentException("未找到对应订阅");
         BeanUtils.copyProperties(dto, entity);
         clashSubscribeMapper.updateById(entity);

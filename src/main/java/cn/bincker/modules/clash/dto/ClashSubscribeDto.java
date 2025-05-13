@@ -8,6 +8,7 @@ import static cn.bincker.common.constant.RegExpConstant.REGEXP_STR_URL;
 
 @Data
 public class ClashSubscribeDto {
+    private Long id;
     @NotEmpty
     private String name;
     @NotEmpty

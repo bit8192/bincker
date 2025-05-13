@@ -44,7 +44,7 @@ public class ClashController {
         return "redirect:/clash/subscribe";
     }
 
-    @PutMapping("subscribe")
+    @PostMapping("subscribe/update")
     public String updateSubscribe(ClashSubscribeDto dto) {
         clashSubscribeService.update(dto);
         return "redirect:/clash/subscribe";
@@ -62,6 +62,7 @@ public class ClashController {
     }
 
     @GetMapping(value = "merge/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     public ResponseEntity<ClashSubscribeMergeConfigDetailVo> mergeDetail(@PathVariable Long id) {
         var detail = clashSubscribeMergeConfigService.getDetailById(id);
         if (detail == null) return ResponseEntity.notFound().build();
@@ -77,13 +78,11 @@ public class ClashController {
 
     @PostMapping("merge")
     public String addMerge(@Validated ClashSubscribeMergeConfigDto dto) {
-        clashSubscribeMergeConfigService.add(dto);
-        return "redirect:/clash/merge";
-    }
-
-    @PutMapping("merge")
-    public String updateMerge(@Validated ClashSubscribeMergeConfigDto dto) {
-        clashSubscribeMergeConfigService.update(dto);
+        if (dto.getId() != null){
+            clashSubscribeMergeConfigService.update(dto);
+        }else{
+            clashSubscribeMergeConfigService.add(dto);
+        }
         return "redirect:/clash/merge";
     }
 

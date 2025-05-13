@@ -90,7 +90,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
 
     @PostConstruct
     public void startMergeTask() {
-        scheduledExecutorService.scheduleWithFixedDelay(() -> taskExecutor.execute(this::mergeTimeoutConfigs), 10, 60, TimeUnit.SECONDS);
+//        scheduledExecutorService.scheduleWithFixedDelay(() -> taskExecutor.execute(this::mergeTimeoutConfigs), 10, 60, TimeUnit.SECONDS);
         mihomoInstalled = checkMihomo();
     }
 
@@ -466,13 +466,17 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         var target = clashSubscribeMergeConfigMapper.selectById(id);
         var vo = new ClashSubscribeMergeConfigDetailVo();
         BeanUtils.copyProperties(target, vo);
-        List<ClashSubscribe> subscribes = getClashSubscribes(target);
-        if (subscribes.size() > 3) {
-            vo.setSubscribeNames(subscribes.subList(0, 3).stream().map(ClashSubscribe::getName).collect(Collectors.joining("、")) + "等" + subscribes.size() + "个订阅");
+        if ("all".equalsIgnoreCase(target.getSubscribeIds())){
+            vo.setSubscribeNames("全部订阅");
         }else{
-            vo.setSubscribeNames(subscribes.stream().map(ClashSubscribe::getName).collect(Collectors.joining("、")));
+            List<ClashSubscribe> subscribes = getClashSubscribes(target);
+            if (subscribes.size() > 3) {
+                vo.setSubscribeNames(subscribes.subList(0, 3).stream().map(ClashSubscribe::getName).collect(Collectors.joining("、")) + "等" + subscribes.size() + "个订阅");
+            }else{
+                vo.setSubscribeNames(subscribes.stream().map(ClashSubscribe::getName).collect(Collectors.joining("、")));
+            }
         }
-        return null;
+        return vo;
     }
 
     private List<ClashSubscribe> getClashSubscribes(ClashSubscribeMergeConfig target) {

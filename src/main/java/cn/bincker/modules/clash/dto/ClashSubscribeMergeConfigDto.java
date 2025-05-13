@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class ClashSubscribeMergeConfigDto {
+    private Long id;
     @NotEmpty
     private String name;
 

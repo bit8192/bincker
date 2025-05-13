@@ -14,7 +14,7 @@
 <main class="container-xxl p-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Clash 合并管理</h1>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMergeModal">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMergeModal" id="btnAddMerge">
             <i class="bi bi-plus-lg"></i> 添加合并
         </button>
     </div>
@@ -696,6 +696,10 @@ $(function() {
     const overrideConfig = $("#overrideConfig");
     overrideConfig.val(overrideConfig.val().replace("secret: 123456", "secret: " + Math.floor(Math.random() * 1000000000).toString(36)));
 
+    $("#btnAddMerge").click(function () {
+        $("input[name=id]").remove()
+    })
+
     $("#saveMerge").click(function () {
         $("#addMergeForm").submit()
     });
@@ -724,8 +728,7 @@ $(function() {
         fetch(`/clash/merge/${id}`)
             .then(response => response.json())
             .then(data => {
-                $("#addMergeForm").attr("method", "put");
-                $("#addMergeForm").attr("action", "/clash/merge");
+                $("#addMergeForm").append($('<input type="hidden" name="id" value="' + id + '" />'));
                 $("#mergeName").val(data.name);
                 $("#overrideConfig").val(data.overrideConfig);
                 $("#limitDelay").val(data.limitDelay);
