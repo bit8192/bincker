@@ -90,7 +90,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
 
     @PostConstruct
     public void startMergeTask() {
-//        scheduledExecutorService.scheduleWithFixedDelay(() -> taskExecutor.execute(this::mergeTimeoutConfigs), 10, 60, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleWithFixedDelay(() -> taskExecutor.execute(this::mergeTimeoutConfigs), 10, 60, TimeUnit.SECONDS);
         mihomoInstalled = checkMihomo();
     }
 
@@ -189,8 +189,6 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                                 "-d", mihomoWorkDir.toFile().getAbsolutePath()
                         )
                                 .directory(mihomoWorkDir.toFile())
-                                .redirectOutput(new File("mihomo.log"))
-                                .redirectError(ProcessBuilder.Redirect.INHERIT)
                                 .start();
                         try {
                             process.waitFor(1, TimeUnit.SECONDS);
