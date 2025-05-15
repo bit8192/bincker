@@ -1,6 +1,6 @@
 package cn.bincker.modules.clash.yaml;
 
-import cn.bincker.common.utils.KebabCaseUtils;
+import cn.bincker.common.utils.NameUtils;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.NodeTuple;
@@ -18,6 +18,6 @@ public class NoNullRepresenter extends Representer {
         if (raw.getValueNode().getTag().equals(Tag.NULL)){
             return null;
         }
-        return new NodeTuple(representData(KebabCaseUtils.camelCaseToKebabCase(property.getName())), raw.getValueNode());
+        return new NodeTuple(representData(NameUtils.camelCaseToKebabCase(property.getName())), raw.getValueNode());
     }
 }

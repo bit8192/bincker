@@ -35,7 +35,6 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
@@ -347,7 +346,12 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
             return parseBase64Content(subscribe, strContent);
         }
         ClashConfig config;
-        config = yaml.load(new ByteArrayInputStream(content));
+        try {
+            config = yaml.load(new ByteArrayInputStream(content));
+        }catch (Exception e){
+            log.error("read subscribe error: content={}", new String(content), e);
+            return null;
+        }
         var proxies = config.getProxies();
         if (proxies == null || proxies.isEmpty()) return Collections.emptyList();
         if (subscribe.getSkipProxies() != null && subscribe.getSkipProxies() < proxies.size()) {

@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>404</title>
+    <title>错误</title>
     <th:block th:insert="~{common/basic :: css}"/>
     <th:block th:insert="~{common/basic :: js}"/>
 </head>
 <body>
 <th:block th:insert="~{common/basic :: nav}"/>
 <main class="container-xxl p-5">
-    <h1>404</h1>
-    <span class="text-secondary-emphasis">您访问的资源不存在</span>
+    <h1>错误</h1>
+    <p th:text="${path}"></p>
+    <p th:text="${message}"></p>
+    <p th:text="${binding_errors}"></p>
+    <p th:text="${status}"></p>
+    <p th:text="${error}"></p>
+    <p th:text="${stack_trace}"></p>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
 </body>
