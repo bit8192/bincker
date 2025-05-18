@@ -1,6 +1,6 @@
 package cn.bincker.modules.todo.entity;
 
-import cn.bincker.common.DDL;
+import cn.bincker.common.annotation.DDL;
 import cn.bincker.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

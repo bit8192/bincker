@@ -23,8 +23,9 @@
         <colgroup>
             <col>
             <col>
-            <col style="width: 60%">
+            <col style="width: 40%">
             <col style="width: 9em">
+            <col>
             <col>
             <col>
         </colgroup>
@@ -35,6 +36,8 @@
             <th class="text-nowrap">url</th>
             <th class="text-nowrap">更新时间</th>
             <th class="text-nowrap">剩余流量</th>
+            <th class="text-nowrap">延迟</th>
+            <th class="text-nowrap">节点数量</th>
             <th class="text-nowrap">状态</th>
         </tr>
         </thead>
@@ -43,8 +46,10 @@
             <td th:text="${row.id}"></td>
             <td th:text="${row.name}"></td>
             <td class="text-truncate" th:text="${row.url}"></td>
-            <td class="text-nowrap" th:text="${#dates.format(row.lastUpdateTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td class="text-nowrap" th:text="${#dates.format(row.latestUpdateTime, 'yyyy-MM-dd HH:mm')}"></td>
             <td th:text="${( row.totalTraffic - row.downloadTraffic - row.uploadTraffic ) / 1024 / 1024 / 1024 } + 'GB'"></td>
+            <td th:text="${row.minDelay} + '/' + ${row.maxDelay}"></td>
+            <td th:text="${row.proxyCount}"></td>
             <td th:text="${row.status}"></td>
         </tr>
         </tbody>

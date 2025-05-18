@@ -1,6 +1,6 @@
 package cn.bincker.modules.auth.entity;
 
-import cn.bincker.common.DDL;
+import cn.bincker.common.annotation.DDL;
 import cn.bincker.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +16,6 @@ import java.util.List;
 @Data
 @TableName(value = "user", autoResultMap = true)
 @DDL("""
-drop table if exists user;
 create table if not exists user(
     id integer primary key autoincrement,
     created_time timestamp default current_timestamp,

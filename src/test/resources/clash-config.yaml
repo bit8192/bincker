@@ -4,6 +4,7 @@ bind-address: '*'
 mode: rule
 log-level: info
 external-controller: '127.0.0.1:9090'
+secret: asdfasd
 dns:
   enable: true
   ipv6: false

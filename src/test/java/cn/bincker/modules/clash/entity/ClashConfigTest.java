@@ -12,7 +12,9 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
@@ -23,9 +25,12 @@ public class ClashConfigTest {
     @Test
     public void testConfigSerialization() throws IOException {
         // 读取原始配置文件
-        String originalYaml = Files.lines(Paths.get("src/test/resources/clash-config.yaml"))
-                .filter(line -> !line.trim().startsWith("#")) // 过滤掉注释行
-                .collect(Collectors.joining("\n"));
+        String originalYaml;
+        try(var lines = Files.lines(Paths.get("src/test/resources/clash-config.yaml"))) {
+            originalYaml = lines
+                    .filter(line -> !line.trim().startsWith("#")) // 过滤掉注释行
+                    .collect(Collectors.joining("\n"));
+        }
 
         // 创建YAML解析器
         var loadOptions = new LoaderOptions();
@@ -40,7 +45,7 @@ public class ClashConfigTest {
 //        var dumpYaml = new Yaml(representer);
 
         // 将YAML解析为ClashConfig对象
-        ClashConfig config = loadYaml.load(originalYaml);
+        ClashConfig config = loadYaml.load(new ByteArrayInputStream(originalYaml.getBytes(StandardCharsets.UTF_16)));
         
         // 将ClashConfig对象序列化回YAML
         String serializedYaml = loadYaml.dump(config);

@@ -1,7 +1,7 @@
 package cn.bincker.system.database;
 
-import cn.bincker.common.DDL;
-import cn.bincker.modules.auth.entity.User;
+import cn.bincker.common.annotation.DDL;
+import cn.bincker.modules.todo.entity.Todo;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
@@ -15,13 +15,13 @@ class DatabaseSchemaSynchronizerTest {
             Pattern.CASE_INSENSITIVE & Pattern.MULTILINE
     );
     private static final Pattern REGEXP_SQL_FIELD = Pattern.compile(
-            "([a-zA-Z_]+)\\s+[a-zA-Z]+(?:\\(\\s*\\d+(?:\\s*\\d+\\s*,\\s*)*\\))?(?:\\s*\\w+\\s*)*",
+            "([a-zA-Z_]+)\\s+(?:\\w+\\s+)*[a-zA-Z]+(?:\\(\\s*\\d+(?:\\s*\\d+\\s*,\\s*)*\\))?(?:\\s*\\w+\\s*)*",
             Pattern.CASE_INSENSITIVE
     );
 
     @Test
     void regexTest() {
-        var ddl = Objects.requireNonNull(User.class.getAnnotation(DDL.class)).value();
+        var ddl = Objects.requireNonNull(Todo.class.getAnnotation(DDL.class)).value();
         var matcher = REGEXP_SQL_FIELDS.matcher(ddl);
         assertTrue(matcher.find());
         var fields = matcher.group(1);

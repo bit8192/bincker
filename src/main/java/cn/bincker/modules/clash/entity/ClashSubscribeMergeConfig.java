@@ -1,6 +1,6 @@
 package cn.bincker.modules.clash.entity;
 
-import cn.bincker.common.DDL;
+import cn.bincker.common.annotation.DDL;
 import cn.bincker.common.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;

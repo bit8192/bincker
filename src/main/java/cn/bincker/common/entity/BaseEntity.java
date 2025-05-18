@@ -1,6 +1,6 @@
 package cn.bincker.common.entity;
 
-import cn.bincker.common.DDL;
+import cn.bincker.common.annotation.DDL;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

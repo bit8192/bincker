@@ -42,3 +42,5 @@ database.db
 /blog/
 my-env/.last_update_available_check
 remember-me.key
+mihomo
+mihomo.log

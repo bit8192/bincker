@@ -20,4 +20,5 @@ public class NoNullRepresenter extends Representer {
         }
         return new NodeTuple(representData(NameUtils.camelCaseToKebabCase(property.getName())), raw.getValueNode());
     }
+
 }

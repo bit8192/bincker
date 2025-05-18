@@ -41,7 +41,8 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests(authorize->
                                 authorize
                                         .requestMatchers("/todo/**").authenticated()
-                                        .requestMatchers("/mihomo/**").authenticated()
+                                        .requestMatchers("/clash/config.yaml").permitAll()
+                                        .requestMatchers("/clash/**").authenticated()
                                         .requestMatchers("/auth/**").permitAll()
                                         .anyRequest().permitAll()
                 )

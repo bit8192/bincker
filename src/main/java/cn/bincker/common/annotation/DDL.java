@@ -1,4 +1,4 @@
-package cn.bincker.common;
+package cn.bincker.common.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

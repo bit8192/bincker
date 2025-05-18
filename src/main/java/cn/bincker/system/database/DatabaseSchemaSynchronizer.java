@@ -1,6 +1,6 @@
 package cn.bincker.system.database;
 
-import cn.bincker.common.DDL;
+import cn.bincker.common.annotation.DDL;
 import cn.bincker.common.utils.NameUtils;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class DatabaseSchemaSynchronizer implements ApplicationListener<ApplicationReadyEvent> {
     private static final Pattern REGEXP_SQL_TABLE_NAME = Pattern.compile(
-            "create table (?:if not exists )?(\\S+)",
+            "create table (?:if not exists )?([a-zA-Z_]+)",
             Pattern.CASE_INSENSITIVE
     );
     private static final Pattern REGEXP_SQL_FIELDS = Pattern.compile(
@@ -31,7 +31,7 @@ public class DatabaseSchemaSynchronizer implements ApplicationListener<Applicati
             Pattern.CASE_INSENSITIVE & Pattern.MULTILINE
     );
     private static final Pattern REGEXP_SQL_FIELD = Pattern.compile(
-            "([a-zA-Z_]+)\\s+[a-zA-Z]+(?:\\(\\s*\\d+(?:\\s*\\d+\\s*,\\s*)*\\))?(?:\\s*\\w+\\s*)*",
+            "([a-zA-Z_]+)\\s+(?:\\w+\\s+)*[a-zA-Z]+(?:\\(\\s*\\d+(?:\\s*\\d+\\s*,\\s*)*\\))?(?:\\s*\\w+\\s*)*",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -41,6 +41,7 @@ public class DatabaseSchemaSynchronizer implements ApplicationListener<Applicati
         var mappers = application.getBeansOfType(Mapper.class);
 
         try(var connection = application.getBean(DataSource.class).getConnection()) {
+            connection.setAutoCommit(true);
             var tables = selectTables(connection);
             for (var mapper : mappers.values()) {
                 var entityType = ReflectionKit.getSuperClassGenericType(mapper.getClass(), Mapper.class, 0);
@@ -51,7 +52,7 @@ public class DatabaseSchemaSynchronizer implements ApplicationListener<Applicati
                 if (tableNameAnnotation != null) {
                     tableName = tableNameAnnotation.value();
                 } else {
-                    var matcher = REGEXP_SQL_TABLE_NAME.matcher(entityType.getName());
+                    var matcher = REGEXP_SQL_TABLE_NAME.matcher(ddlAnnotation.value());
                     if (matcher.find()) {
                         tableName = matcher.group(1);
                     } else {

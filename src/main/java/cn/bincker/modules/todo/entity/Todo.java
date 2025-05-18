@@ -1,6 +1,6 @@
 package cn.bincker.modules.todo.entity;
 
-import cn.bincker.common.DDL;
+import cn.bincker.common.annotation.DDL;
 import cn.bincker.common.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -13,7 +13,6 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "todo",autoResultMap = true)
 @DDL("""
-        drop table if exists todo;
         create table if not exists todo(
         id integer primary key autoincrement,
         created_time timestamp default current_timestamp,

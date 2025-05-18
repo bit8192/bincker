@@ -6,6 +6,7 @@ import cn.bincker.modules.clash.entity.ClashSubscribeMergeConfig;
 import cn.bincker.modules.clash.entity.config.ClashConfig;
 import cn.bincker.modules.clash.entity.config.ProxyConfig;
 import cn.bincker.modules.clash.entity.config.ProxyGroupConfig;
+import cn.bincker.modules.clash.handler.ClashConfigTypeHandler;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMapper;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMergeConfigMapper;
 import cn.bincker.modules.clash.service.IClashSubscribeMergeConfigService;
@@ -13,8 +14,7 @@ import cn.bincker.modules.clash.utils.ProxyUrlParser;
 import cn.bincker.modules.clash.vo.ClashSubscribeMergeConfigDetailVo;
 import cn.bincker.modules.clash.vo.ClashSubscribeMergeConfigVo;
 import cn.bincker.modules.clash.vo.ClashYamlContentVo;
-import cn.bincker.modules.clash.yaml.CamelCasePropertyUtils;
-import cn.bincker.modules.clash.yaml.NoNullRepresenter;
+import cn.bincker.modules.clash.vo.GithubReleasesInfo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,14 +27,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
@@ -76,15 +73,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         this.taskExecutor = taskExecutor;
         this.objectMapper = objectMapper;
 
-        var loadOptions = new LoaderOptions();
-        var constructor = new Constructor(ClashConfig.class, loadOptions);
-        constructor.addTypeDescription(new TypeDescription(ClashConfig.class));
-        constructor.setPropertyUtils(new CamelCasePropertyUtils());
-        var dumpOptions = new DumperOptions();
-        dumpOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        var representer = new NoNullRepresenter(dumpOptions);
-        representer.addClassTag(ClashConfig.class, Tag.MAP);
-        yaml = new Yaml(constructor, representer, dumpOptions);
+        yaml = ClashConfigTypeHandler.getClashConfigYaml();
     }
 
     @PostConstruct
@@ -109,8 +98,72 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                 return true;
             }
         } catch (Exception ignored) {}
+        var mihomoFile = new File("mihomo");
+        if (mihomoFile.exists()) {
+            if (!mihomoFile.canExecute() && !mihomoFile.setExecutable(true)) {
+                log.error("set mihomo executable failed: path={}", mihomoPath);
+                return false;
+            }
+            mihomoPath = mihomoFile.getAbsolutePath();
+            return true;
+        }
         log.warn("not found mihomo bin");
+        return installMihomo();
+    }
+
+    private boolean checkGzip() {
+        Process progress;
+        try {
+            progress = new ProcessBuilder("gzip", "--version").start();
+            if (progress.waitFor() == 0){
+                return true;
+            }
+        } catch (Exception ignored) {}
         return false;
+    }
+
+    boolean installMihomo() {
+        log.info("install mihomo...");
+        var httpClient = HttpClient.newHttpClient();
+        if (!checkGzip()) {
+            log.error("tar not installed. can not install mihomo.");
+            return false;
+        }
+        try {
+            log.info("get mihomo latest releases...");
+            var request = HttpRequest.newBuilder().uri(URI.create("https://github.bit16.online/MetaCubeX/mihomo/releases/latest")).build();
+            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            Assert.isTrue(response.statusCode() == 200, "get mihomo releases failed. statusCode=" + response.statusCode());
+            log.debug("mihomo releases content: {}", response.body());
+            var releases = objectMapper.readValue(response.body(), GithubReleasesInfo.class);
+            var downloadUrl = String.format("https://github.bit16.online/MetaCubeX/mihomo/releases/download/%s/mihomo-linux-amd64-%s.gz", releases.getTagName(), releases.getTagName());
+            log.info("download mihomo package url={} ...", downloadUrl);
+            request = HttpRequest.newBuilder()
+                    .uri(URI.create(downloadUrl))
+                    .build();
+            var downloadResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            if (downloadResponse.statusCode() != 200){
+                try(var body = downloadResponse.body()){
+                    log.error("download releases failed. statusCode={}, body={}", downloadResponse.statusCode(), new String(body.readAllBytes()));
+                }
+                return false;
+            }
+            mihomoPath = System.getProperty("user.dir") + "/mihomo";
+            var mihomoReleasesFile = mihomoPath + ".gz";
+            try(var in = downloadResponse.body(); var out = new FileOutputStream(mihomoReleasesFile)) {
+                in.transferTo(out);
+            }
+            Process tarProcess = new ProcessBuilder("gzip", "-d", mihomoReleasesFile).start();
+            tarProcess.waitFor(5, TimeUnit.SECONDS);
+            Assert.isTrue(tarProcess.exitValue() == 0, "unpack releases failed. statusCode=" + tarProcess.exitValue() + "\tmsg=" + new String(tarProcess.getErrorStream().readAllBytes()));
+            var mohomoFile = new File(mihomoPath);
+            Assert.isTrue(mohomoFile.setExecutable(true), "set mihomo executable failed.");
+            log.info("install mihomo completed.");
+            return true;
+        } catch (IOException | InterruptedException e) {
+            log.error("install mihomo failed.", e);
+            return false;
+        }
     }
 
     private void mergeTimeoutConfigs() {
@@ -144,22 +197,22 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         clashSubscribes.parallelStream()
                 .filter(Objects::nonNull)
                 .filter(s -> StringUtils.hasText(s.getUrl()))
-                .map(subscribe -> {
-                    List<ProxyConfig> proxies = null;
+                .peek(subscribe -> {
+                    if (subscribe.getLatestUpdateTime() != null && subscribe.getLatestContent() != null && System.currentTimeMillis() - subscribe.getLatestUpdateTime().getTime() < 3600000L){
+                        return;
+                    }
                     try {
-                        proxies = readSubscribe(subscribe);
+                        readSubscribe(subscribe);
                         subscribe.setStatus(ClashSubscribe.Status.NORMAL);
-                        subscribe.setLastUpdateTime(new Date());
+                        subscribe.setLatestUpdateTime(new Date());
                     } catch (Exception e) {
                         log.error("merge clash subscribe error. id={}", subscribe.getId(), e);
                         subscribe.setStatus(ClashSubscribe.Status.ABNORMAL);
-                    } finally {
-                        clashSubscribeMapper.updateById(subscribe);
                     }
-                    return proxies;
                 })
-                .filter(Objects::nonNull)
-                .map(proxies->{
+                .filter(subscribe -> subscribe.getLatestContent() != null && subscribe.getLatestContent().getProxies() != null && !subscribe.getLatestContent().getProxies().isEmpty())
+                .map(subscribe->{
+                    var proxies = subscribe.getLatestContent().getProxies();
                     if (!mihomoInstalled || mergeConfig.getLimitDelay() == null || mergeConfig.getLimitDelay() <= 0) {
                         return proxies;
                     }
@@ -204,12 +257,11 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                                 .uri(URI.create("http://127.0.0.1:" + port + "/group/default/delay?url=https://www.gstatic.com/generate_204&timeout=5000"))
                                 .build();
                         var response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
-                        log.debug("merge clash subscribe response:{}", new String(response.body()));
                         var delayMap = objectMapper.readValue(response.body(), new TypeReference<Map<String, Integer>>() {});
+                        subscribe.setLatestDelay(delayMap);
                         process.destroy();
                         return proxies.stream().filter(p->{
                             var delay = delayMap.get(p.getName());
-                            if (delay == null) log.warn("no delay found for name:{}", p.getName());
                             return delay != null && delay < mergeConfig.getLimitDelay();
                         }).toList();
                     } catch (Exception e) {
@@ -232,6 +284,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                                 log.error("delete temp config file failed.", e);
                             }
                         }
+                        clashSubscribeMapper.updateById(subscribe);
                     }
                 })
                 .forEach(allProxies::addAll);
@@ -320,7 +373,8 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         return groups;
     }
 
-    private List<ProxyConfig> readSubscribe(ClashSubscribe subscribe) throws IOException, InterruptedException {
+    private void readSubscribe(ClashSubscribe subscribe) throws IOException, InterruptedException {
+        subscribe.setLatestContent(null);
         var client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(subscribe.getUrl()))
@@ -340,24 +394,29 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
             Optional.ofNullable(params.get("total")).ifPresent(subscribe::setTotalTraffic);
             Optional.ofNullable(params.get("expire")).ifPresent(expire->subscribe.setExpiredTime(new Date(expire * 1000L)));
         });
-        if (content == null) return null;
+        if (content == null) return;
         var strContent = new String(content, StandardCharsets.UTF_8);
         if (strContent.matches("^([a-zA-Z0-9/=]{4})+$")){
-            return parseBase64Content(subscribe, strContent);
+            var proxies = parseBase64Content(subscribe, strContent);
+            var tempConfig = new ClashConfig();
+            tempConfig.setProxies(proxies);
+            subscribe.setLatestContent(tempConfig);
+            return;
         }
         ClashConfig config;
         try {
             config = yaml.load(new ByteArrayInputStream(content));
         }catch (Exception e){
             log.error("read subscribe error: content={}", new String(content), e);
-            return null;
+            return;
         }
         var proxies = config.getProxies();
-        if (proxies == null || proxies.isEmpty()) return Collections.emptyList();
+        if (proxies == null || proxies.isEmpty()) return;
         if (subscribe.getSkipProxies() != null && subscribe.getSkipProxies() < proxies.size()) {
             proxies = proxies.subList(subscribe.getSkipProxies(), proxies.size());
+            config.setProxies(proxies);
         }
-        return proxies;
+        subscribe.setLatestContent(config);
     }
 
     private List<ProxyConfig> parseBase64Content(ClashSubscribe subscribe, String content) {
