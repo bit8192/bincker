@@ -21,4 +21,6 @@ public interface IClashSubscribeMergeConfigService {
     ClashSubscribeMergeConfigDetailVo getDetailById(Long id);
 
     String getTokenById(Long id);
+
+    void refresh(Long id);
 }

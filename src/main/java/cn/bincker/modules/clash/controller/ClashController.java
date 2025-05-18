@@ -86,6 +86,12 @@ public class ClashController {
         return "redirect:/clash/merge";
     }
 
+    @PostMapping("merge/{id}/refresh")
+    @ResponseBody
+    public void addMerge(@PathVariable Long id) {
+        clashSubscribeMergeConfigService.refresh(id);
+    }
+
     @DeleteMapping("merge/{id}")
     public void deleteMerge(@PathVariable Long id) {
         clashSubscribeMergeConfigService.delete(id);

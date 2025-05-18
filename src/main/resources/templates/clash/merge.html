@@ -39,6 +39,9 @@
                 <button class="btn btn-sm btn-primary copy-link-merge" th:data-id="${row.id}" title="拷贝连接">
                     <i class="bi bi-link"></i>
                 </button>
+                <button class="btn btn-sm btn-primary refresh-merge" th:data-id="${row.id}" title="立即更新">
+                    <i class="bi bi-repeat"></i>
+                </button>
                 <button class="btn btn-sm btn-primary edit-merge" th:data-id="${row.id}" title="编辑">
                     <i class="bi bi-pencil"></i>
                 </button>
@@ -739,6 +742,14 @@ $(function() {
                 $("#subscribeNames").val(data.subscribeNames);
                 addMergeModal.show();
             });
+    });
+
+    // 刷新按钮点击事件
+    $(".refresh-merge").click(function() {
+        const id = $(this).data('id');
+        this.disabled = true;
+        fetch(`/clash/merge/${id}/refresh`, {method: 'POST'})
+            .finally(()=>this.disabled = false)
     });
 
     // 删除按钮点击事件

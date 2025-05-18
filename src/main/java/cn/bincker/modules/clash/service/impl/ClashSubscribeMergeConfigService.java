@@ -6,7 +6,6 @@ import cn.bincker.modules.clash.entity.ClashSubscribeMergeConfig;
 import cn.bincker.modules.clash.entity.config.ClashConfig;
 import cn.bincker.modules.clash.entity.config.ProxyConfig;
 import cn.bincker.modules.clash.entity.config.ProxyGroupConfig;
-import cn.bincker.modules.clash.handler.ClashConfigTypeHandler;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMapper;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMergeConfigMapper;
 import cn.bincker.modules.clash.service.IClashSubscribeMergeConfigService;
@@ -53,6 +52,8 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeConfigService {
+    //从URL读取订阅重试次数
+    private static final int READ_SUBSCRIBE_TIMES = 3;
     private final ClashSubscribeMergeConfigMapper clashSubscribeMergeConfigMapper;
     private final ClashSubscribeMapper clashSubscribeMapper;
     private final ThreadPoolTaskExecutor taskExecutor;
@@ -66,14 +67,14 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
             ClashSubscribeMergeConfigMapper clashSubscribeMergeConfigMapper,
             ClashSubscribeMapper clashSubscribeMapper,
             ThreadPoolTaskExecutor taskExecutor,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            Yaml yaml
     ) {
         this.clashSubscribeMergeConfigMapper = clashSubscribeMergeConfigMapper;
         this.clashSubscribeMapper = clashSubscribeMapper;
         this.taskExecutor = taskExecutor;
         this.objectMapper = objectMapper;
-
-        yaml = ClashConfigTypeHandler.getClashConfigYaml();
+        this.yaml = yaml;
     }
 
     @PostConstruct
@@ -201,14 +202,17 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                     if (subscribe.getLatestUpdateTime() != null && subscribe.getLatestContent() != null && System.currentTimeMillis() - subscribe.getLatestUpdateTime().getTime() < 3600000L){
                         return;
                     }
-                    try {
-                        readSubscribe(subscribe);
-                        subscribe.setStatus(ClashSubscribe.Status.NORMAL);
-                        subscribe.setLatestUpdateTime(new Date());
-                    } catch (Exception e) {
-                        log.error("merge clash subscribe error. id={}", subscribe.getId(), e);
-                        subscribe.setStatus(ClashSubscribe.Status.ABNORMAL);
-                    }
+                    var retryTimes = 0;
+                    do {
+                        try {
+                            readSubscribe(subscribe);
+                            subscribe.setStatus(ClashSubscribe.Status.NORMAL);
+                            subscribe.setLatestUpdateTime(new Date());
+                        } catch (Exception e) {
+                            log.error("merge clash subscribe error. id={}", subscribe.getId(), e);
+                            subscribe.setStatus(ClashSubscribe.Status.ABNORMAL);
+                        }
+                    }while (retryTimes++ < READ_SUBSCRIBE_TIMES);
                 })
                 .filter(subscribe -> subscribe.getLatestContent() != null && subscribe.getLatestContent().getProxies() != null && !subscribe.getLatestContent().getProxies().isEmpty())
                 .map(subscribe->{
@@ -249,7 +253,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                             return proxies;
                         }
                         if (!process.isAlive()){
-                            log.error("check proxy delay mihomo process error: exitCode={}\terror={}", process.exitValue(), new String(process.getErrorStream().readAllBytes()));
+                            log.error("check proxy delay mihomo process error: exitCode={}\terror={}", process.exitValue(), new String(process.getInputStream().readAllBytes()));
                             return proxies;
                         }
                         var httpClient = HttpClient.newHttpClient();
@@ -381,6 +385,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                 .header("User-Agent", "Clash-Verge: v2.2.3")
                 .build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        if (response.statusCode() != 200) return;
         var content = response.body();
         response.headers().firstValue("subscription-userinfo").ifPresent(userinfo->{
             var params = Stream.of(userinfo.split(";"))
@@ -557,5 +562,12 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         var target = clashSubscribeMergeConfigMapper.selectById(id);
         if (target == null) return null;
         return target.getToken();
+    }
+
+    @Override
+    public void refresh(Long id) {
+        var target = clashSubscribeMergeConfigMapper.selectById(id);
+        if (target == null) return;
+        mergeConfig(target);
     }
 }

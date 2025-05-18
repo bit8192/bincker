@@ -25,6 +25,7 @@ public class ProxyConfig {
     private String sni;
     private List<String> alpn;
     private String uuid;
+    @JsonProperty("alterId")
     private Integer alterId;
     private String cipher;
     private String psk;

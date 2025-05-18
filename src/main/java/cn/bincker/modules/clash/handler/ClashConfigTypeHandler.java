@@ -1,16 +1,9 @@
 package cn.bincker.modules.clash.handler;
 
 import cn.bincker.modules.clash.entity.config.ClashConfig;
-import cn.bincker.modules.clash.yaml.CamelCasePropertyUtils;
-import cn.bincker.modules.clash.yaml.NoNullRepresenter;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -20,21 +13,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ClashConfigTypeHandler extends BaseTypeHandler<ClashConfig> {
-    private static final Yaml YAML;
-    static {
-        var loadOptions = new LoaderOptions();
-        var constructor = new Constructor(ClashConfig.class, loadOptions);
-        constructor.addTypeDescription(new TypeDescription(ClashConfig.class));
-        constructor.setPropertyUtils(new CamelCasePropertyUtils());
-        var dumpOptions = new DumperOptions();
-        dumpOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        var representer = new NoNullRepresenter(dumpOptions);
-        representer.addClassTag(ClashConfig.class, Tag.MAP);
-        YAML = new Yaml(constructor, representer, dumpOptions);
+    private static Yaml YAML;
+
+    private static Yaml getClashConfigYaml() {
+        return YAML;
     }
 
-    public static Yaml getClashConfigYaml() {
-        return YAML;
+    public static void setClashConfigYaml(Yaml yaml) {
+        YAML = yaml;
     }
 
     @Override
