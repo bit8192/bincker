@@ -477,9 +477,9 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                                         .filter(Objects::nonNull)
                                         .collect(Collectors.toList());
                             }
-                            vo.setDownloadTraffic(subscribes.stream().map(ClashSubscribe::getDownloadTraffic).filter(Objects::nonNull).mapToLong(c->c).sum());
-                            vo.setUploadTraffic(subscribes.stream().map(ClashSubscribe::getUploadTraffic).filter(Objects::nonNull).mapToLong(c->c).sum());
-                            vo.setTotalTraffic(subscribes.stream().map(ClashSubscribe::getTotalTraffic).filter(Objects::nonNull).mapToLong(c->c).sum());
+                            vo.setDownloadTraffic(subscribes.stream().mapToLong(ClashSubscribe::getDownloadTraffic).sum());
+                            vo.setUploadTraffic(subscribes.stream().mapToLong(ClashSubscribe::getUploadTraffic).sum());
+                            vo.setTotalTraffic(subscribes.stream().mapToLong(ClashSubscribe::getTotalTraffic).sum());
                             return vo;
                         })
                         .toList()
@@ -497,7 +497,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         vo.setDownloadTraffic(subscribes.stream().mapToLong(ClashSubscribe::getDownloadTraffic).sum());
         vo.setUploadTraffic(subscribes.stream().mapToLong(ClashSubscribe::getUploadTraffic).sum());
         vo.setTotalTraffic(subscribes.stream().mapToLong(ClashSubscribe::getTotalTraffic).sum());
-        vo.setExpire(subscribes.stream().mapToLong(s->s.getExpiredTime().getTime()).max().orElse(-1));
+        vo.setExpire(subscribes.stream().map(ClashSubscribe::getExpiredTime).filter(Objects::nonNull).mapToLong(Date::getTime).max().orElse(-1));
         return vo;
     }
 
