@@ -9,7 +9,6 @@ import java.util.Map;
 public class ProxyGroupConfig {
     private String name;
     private String type;
-    private List<String> proxies;
     private Integer tolerance;
     private Boolean lazy;
     @JsonProperty("expected-status")
@@ -28,6 +27,7 @@ public class ProxyGroupConfig {
     @JsonProperty("health-check")
     private HealthCheckConfig healthCheck;
     private Map<String, Object> override;
+    private List<String> proxies;
 }
 
 @Data

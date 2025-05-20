@@ -264,7 +264,6 @@ public class ProxyUrlParser {
         int port = Integer.parseInt(matcher.group(3));
         String addons = matcher.group(5);
         String name = matcher.group(6);
-        if (addons != null) addons = "";
 
         Map<String, String> params = new HashMap<>();
         if (addons != null) {

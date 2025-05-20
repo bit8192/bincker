@@ -1,11 +1,13 @@
 package cn.bincker.modules.clash.service.impl;
 
+import cn.bincker.common.exception.SystemException;
 import cn.bincker.modules.clash.dto.ClashSubscribeMergeConfigDto;
 import cn.bincker.modules.clash.entity.ClashSubscribe;
 import cn.bincker.modules.clash.entity.ClashSubscribeMergeConfig;
 import cn.bincker.modules.clash.entity.config.ClashConfig;
 import cn.bincker.modules.clash.entity.config.ProxyConfig;
 import cn.bincker.modules.clash.entity.config.ProxyGroupConfig;
+import cn.bincker.modules.clash.handler.ClashConfigTypeHandler;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMapper;
 import cn.bincker.modules.clash.mapper.ClashSubscribeMergeConfigMapper;
 import cn.bincker.modules.clash.service.IClashSubscribeMergeConfigService;
@@ -17,6 +19,7 @@ import cn.bincker.modules.clash.vo.GithubReleasesInfo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -26,12 +29,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -57,7 +56,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
     private final ClashSubscribeMergeConfigMapper clashSubscribeMergeConfigMapper;
     private final ClashSubscribeMapper clashSubscribeMapper;
     private final ThreadPoolTaskExecutor taskExecutor;
-    private final Yaml yaml;
+    private final ObjectMapper yamlObjectMapper;
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private boolean mihomoInstalled;
     private String mihomoPath;
@@ -67,14 +66,13 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
             ClashSubscribeMergeConfigMapper clashSubscribeMergeConfigMapper,
             ClashSubscribeMapper clashSubscribeMapper,
             ThreadPoolTaskExecutor taskExecutor,
-            ObjectMapper objectMapper,
-            Yaml yaml
+            ObjectMapper objectMapper
     ) {
         this.clashSubscribeMergeConfigMapper = clashSubscribeMergeConfigMapper;
         this.clashSubscribeMapper = clashSubscribeMapper;
         this.taskExecutor = taskExecutor;
         this.objectMapper = objectMapper;
-        this.yaml = yaml;
+        this.yamlObjectMapper = ClashConfigTypeHandler.getOBJECT_MAPPER();
     }
 
     @PostConstruct
@@ -203,16 +201,21 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                         return;
                     }
                     var retryTimes = 0;
+                    var success = false;
                     do {
                         try {
                             readSubscribe(subscribe);
                             subscribe.setStatus(ClashSubscribe.Status.NORMAL);
                             subscribe.setLatestUpdateTime(new Date());
+                            success = true;
                         } catch (Exception e) {
                             log.error("merge clash subscribe error. id={}", subscribe.getId(), e);
                             subscribe.setStatus(ClashSubscribe.Status.ABNORMAL);
                         }
-                    }while (retryTimes++ < READ_SUBSCRIBE_TIMES);
+                    }while (retryTimes++ < READ_SUBSCRIBE_TIMES && !success);
+                    if (!success) {
+                        clashSubscribeMapper.updateById(subscribe);
+                    }
                 })
                 .filter(subscribe -> subscribe.getLatestContent() != null && subscribe.getLatestContent().getProxies() != null && !subscribe.getLatestContent().getProxies().isEmpty())
                 .map(subscribe->{
@@ -237,7 +240,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                         }
                         mihomoWorkDir = Files.createTempDirectory("mihomo-test");
                         var configFile = mihomoWorkDir.resolve("config.yml");
-                        Files.writeString(configFile, yaml.dump(clashConfig));
+                        Files.writeString(configFile, yamlObjectMapper.writeValueAsString(clashConfig));
                         process = new ProcessBuilder(
                                 mihomoPath,
                                 "-f", configFile.toFile().getAbsolutePath(),
@@ -261,6 +264,10 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
                                 .uri(URI.create("http://127.0.0.1:" + port + "/group/default/delay?url=https://www.gstatic.com/generate_204&timeout=5000"))
                                 .build();
                         var response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+                        if (response.statusCode() != 200){
+                            log.error("check proxy delay error. id={}\tresponse={}", subscribe.getId(), new String(response.body()));
+                            return proxies;
+                        }
                         var delayMap = objectMapper.readValue(response.body(), new TypeReference<Map<String, Integer>>() {});
                         subscribe.setLatestDelay(delayMap);
                         process.destroy();
@@ -306,9 +313,15 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
             throw new RuntimeException("merge clash subscribe error: no match proxies");
         }
         // 构造新的ClashConfig
-        ClashConfig override = mergeConfig.getOverrideConfig() != null && !mergeConfig.getOverrideConfig().isEmpty()
-                ? yaml.load(new ByteArrayInputStream(mergeConfig.getOverrideConfig().getBytes()))
-                : new ClashConfig();
+        ClashConfig override;
+        try {
+            override = mergeConfig.getOverrideConfig() != null && !mergeConfig.getOverrideConfig().isEmpty()
+                    ? yamlObjectMapper.readValue(mergeConfig.getOverrideConfig().getBytes(), ClashConfig.class)
+                    : new ClashConfig();
+        } catch (IOException e) {
+            log.error("merge clash subscribe error.", e);
+            throw new SystemException(e);
+        }
         override.setProxies(filtered);
         // proxyGroups
         if (override.getProxyGroups() == null || override.getProxyGroups().isEmpty()) {
@@ -328,7 +341,13 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
             override.setRules(defaultRules());
         }
         // 序列化回YAML
-        String newYaml = yaml.dump(override);
+        String newYaml;
+        try {
+            newYaml = yamlObjectMapper.writeValueAsString(override);
+        } catch (JsonProcessingException e) {
+            log.error("write yaml error.", e);
+            throw new SystemException(e);
+        }
         mergeConfig.setLatestMergeContent(newYaml);
         mergeConfig.setLatestMergeTime(new Date());
         clashSubscribeMergeConfigMapper.updateById(mergeConfig);
@@ -404,14 +423,15 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         if (strContent.matches("^([a-zA-Z0-9/=]{4})+$")){
             var proxies = parseBase64Content(subscribe, strContent);
             var tempConfig = new ClashConfig();
-            tempConfig.setProxies(proxies);
+            tempConfig.setProxies(distinctProxies(proxies));
             subscribe.setLatestContent(tempConfig);
             return;
         }
         ClashConfig config;
         try {
-            config = yaml.load(new ByteArrayInputStream(content));
+            config = yamlObjectMapper.readValue(new InputStreamReader(new ByteArrayInputStream(content), StandardCharsets.UTF_8), ClashConfig.class);
         }catch (Exception e){
+            Files.write(Path.of("src/test/resources/clash-config-test.yaml"), content);
             log.error("read subscribe error: content={}", new String(content), e);
             return;
         }
@@ -419,9 +439,15 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
         if (proxies == null || proxies.isEmpty()) return;
         if (subscribe.getSkipProxies() != null && subscribe.getSkipProxies() < proxies.size()) {
             proxies = proxies.subList(subscribe.getSkipProxies(), proxies.size());
-            config.setProxies(proxies);
+            config.setProxies(distinctProxies(proxies));
         }
         subscribe.setLatestContent(config);
+    }
+
+    private List<ProxyConfig> distinctProxies(List<ProxyConfig> proxies) {
+        var proxyMap = new HashMap<String, ProxyConfig>();
+        proxies.forEach(p->proxyMap.put(p.getName(), p));
+        return new ArrayList<>(proxyMap.values());
     }
 
     private List<ProxyConfig> parseBase64Content(ClashSubscribe subscribe, String content) {
