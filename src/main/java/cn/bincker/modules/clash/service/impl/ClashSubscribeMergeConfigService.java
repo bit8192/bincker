@@ -471,7 +471,7 @@ public class ClashSubscribeMergeConfigService implements IClashSubscribeMergeCon
     @Override
     public Page<ClashSubscribeMergeConfigVo> page(ClashSubscribeMergeConfigDto dto, Page<ClashSubscribeMergeConfig> page) {
         var result = clashSubscribeMergeConfigMapper.selectPage(page, new QueryWrapper<ClashSubscribeMergeConfig>()
-                .like(dto.getName() != null, "name", dto.getName())
+                .like(dto.getName() != null, "name", dto.getName()).orderByAsc("id")
         );
         var voPage = new Page<ClashSubscribeMergeConfigVo>(result.getCurrent(), result.getSize(), result.getTotal());
         Map<Long, ClashSubscribe> subscribeMap;

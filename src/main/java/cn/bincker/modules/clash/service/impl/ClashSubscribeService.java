@@ -23,7 +23,7 @@ public class ClashSubscribeService implements IClashSubscribeService {
         return clashSubscribeMapper.selectPage(page, new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ClashSubscribe>()
                 .like(clashSubscribeDto.getName() != null, "name", clashSubscribeDto.getName())
                 .like(clashSubscribeDto.getUrl() != null, "url", clashSubscribeDto.getUrl())
-                .orderByAsc("(select min(value) from json_each(ifnull(latest_delay, '{}')))")
+                .orderByAsc("(select min(value) from json_each(ifnull(latest_delay, '{\"max\": 99999}')))")
         );
     }
 

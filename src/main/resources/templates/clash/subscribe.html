@@ -23,7 +23,6 @@
         <colgroup>
             <col>
             <col>
-            <col style="width: 40%">
             <col style="width: 9em">
             <col>
             <col>
@@ -33,24 +32,28 @@
         <tr>
             <th class="text-nowrap">ID</th>
             <th class="text-nowrap">名称</th>
-            <th class="text-nowrap">url</th>
             <th class="text-nowrap">更新时间</th>
             <th class="text-nowrap">剩余流量</th>
             <th class="text-nowrap">延迟</th>
             <th class="text-nowrap">节点数量</th>
             <th class="text-nowrap">状态</th>
+            <th class="text-nowrap">操作</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="row : ${page.records}">
             <td th:text="${row.id}"></td>
-            <td th:text="${row.name}"></td>
-            <td class="text-truncate" th:text="${row.url}"></td>
+            <td class="text-nowrap" th:text="${row.name}"></td>
             <td class="text-nowrap" th:text="${#dates.format(row.latestUpdateTime, 'yyyy-MM-dd HH:mm')}"></td>
             <td th:text="${( row.totalTraffic - row.downloadTraffic - row.uploadTraffic ) / 1024 / 1024 / 1024 } + 'GB'"></td>
             <td th:text="${row.minDelay} + '/' + ${row.maxDelay}"></td>
             <td th:text="${row.proxyCount}"></td>
             <td th:text="${row.status}"></td>
+            <td>
+                <button class="btn btn-sm btn-danger btn-delete" th:data-id="${row.id}" title="删除">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -103,6 +106,19 @@
 
             $('#addSubscriptionForm').submit();
         });
+
+        $(".btn-delete").click(function () {
+            if (!confirm("确定要删除这个订阅吗？")) return;
+            const id = this.dataset.id;
+            this.disabled = true;
+            fetch("/clash/subscribe/" + id, {method: 'delete'})
+                .then(()=>location.reload())
+                .catch(e=>{
+                    alert('删除失败');
+                    console.error(e);
+                    this.disabled = false;
+                });
+        })
     });
 </script>
 </body>

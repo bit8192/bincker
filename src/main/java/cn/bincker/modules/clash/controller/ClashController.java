@@ -51,6 +51,7 @@ public class ClashController {
     }
 
     @DeleteMapping("subscribe/{id}")
+    @ResponseBody
     public void deleteSubscribe(@PathVariable Long id) {
         clashSubscribeService.delete(id);
     }
