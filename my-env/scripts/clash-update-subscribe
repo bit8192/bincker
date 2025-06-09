@@ -2,6 +2,7 @@
 set -e
 url="$1"
 url_file="$HOME/.config/clash/subscribe.url"
+config_file="$HOME/.config/clash/config.yaml"
 service_name="clash-meta@$(id -un)"
 
 function usage() {
@@ -23,7 +24,8 @@ if ! command -v curl >/dev/null; then
     exit 1
 fi
 
-curl -sL "$url" -o "$url_file"
+curl -sL "$url" -o "$config_file"
+echo "$url" > "$url_file"
 if systemctl list-units | grep -q "$service_name"; then
     sudo systemctl restart "$service_name"
 fi
