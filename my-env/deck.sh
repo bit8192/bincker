@@ -77,7 +77,7 @@ deck-update-keyring() {
     sudo pacman-key --init           # 重新初始化
     sudo pacman-key --populate archlinux  # 仅加载 Arch 官方密钥
 
-    if grep -q archlinuxcn /etc/pacman.conf; then
+    if ! grep -q archlinuxcn /etc/pacman.conf; then
         echo "[archlinuxcn]
 Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch" | sudo tee -a /etc/pacman.conf
     fi
