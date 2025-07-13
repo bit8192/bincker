@@ -22,16 +22,16 @@ function deck-readonly-disable-instant() {
     # 如果系统是只读的，则临时禁用
     if steamos-readonly status | grep -q "enabled"; then
         echo "Temporarily disabling readonly..."
-        steamos-readonly disable
+        sudo steamos-readonly disable
 
         # 执行传入的命令
-        echo "Executing command: $@"
-        "$@"
+        echo "Executing command: sudo $@"
+        sudo "$@"
         exit_code=$?
 
         # 恢复只读状态
         echo "Re-enabling readonly..."
-        steamos-readonly enable
+        sudo steamos-readonly enable
     else
         # 如果系统已经是可写的，直接执行命令
         echo "System is already writable, executing command..."
