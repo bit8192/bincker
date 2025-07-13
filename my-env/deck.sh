@@ -9,12 +9,6 @@ fi
 export PATH=$PATH:$HOME/.local/bin
 
 function deck-readonly-disable-instant() {
-  # 检查是否以 root 用户运行
-    if [ "$(id -u)" -ne 0 ]; then
-        echo "Error: This function must be run as root. Use 'sudo -i' first."
-        return 1
-    fi
-
     # 检查当前只读状态
     readonly_status=$(steamos-readonly status)
     echo "Current readonly status: $readonly_status"
