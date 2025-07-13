@@ -73,8 +73,16 @@ deck-update-keyring() {
     }
 
     # 刷新所有密钥
-    echo "Refreshing all keys..."
-    sudo pacman-key --refresh-keys || echo "Key refresh completed with warnings"
+    echo "init keys..."
+    sudo pacman-key --init           # 重新初始化
+    sudo pacman-key --populate archlinux  # 仅加载 Arch 官方密钥
+
+    if grep -q archlinuxcn /etc/pacman.conf; then
+        echo "[archlinuxcn]
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch" | sudo tee -a /etc/pacman.conf
+    fi
+    sudo pacman-key --lsign-key "farseerfc@archlinux.org"
+    sudo pacman -Sy archlinuxcn-keyring
 
     # 恢复原始只读状态
     if $readonly_was_enabled; then
