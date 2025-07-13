@@ -79,7 +79,7 @@ deck-update-keyring() {
 
     if ! grep -q archlinuxcn /etc/pacman.conf; then
         echo "[archlinuxcn]
-Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch" | sudo tee -a /etc/pacman.conf
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/\$arch" | sudo tee -a /etc/pacman.conf
     fi
     sudo pacman-key --lsign-key "farseerfc@archlinux.org"
     sudo pacman -Sy archlinuxcn-keyring
