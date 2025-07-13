@@ -8,7 +8,8 @@ if [ ! -d "$BIN_DIR" ]; then
 fi
 export PATH=$PATH:$HOME/.local/bin
 
-function deck-readonly-disable-instant() {
+#临时禁用只读
+deck-readonly-disable-instant() {
     # 检查当前只读状态
     readonly_status=$(steamos-readonly status)
     echo "Current readonly status: $readonly_status"
@@ -35,4 +36,52 @@ function deck-readonly-disable-instant() {
 
     # 返回执行命令的退出码
     return $exit_code
+}
+
+deck-update-keyring() {
+    # 保存当前只读状态
+    readonly_was_enabled=$(sudo steamos-readonly status | grep -q "enabled" && echo true || echo false)
+
+    # 临时禁用只读模式（如果需要）
+    if $readonly_was_enabled; then
+        echo "Temporarily disabling readonly..."
+        sudo steamos-readonly disable
+    fi
+
+    # 修复密钥环目录权限
+    echo "Fixing keyring permissions..."
+    sudo chmod 755 /etc/pacman.d/gnupg
+    sudo chown -R root:root /etc/pacman.d/gnupg
+
+    # 更新密钥环（分步骤执行）
+    echo "Step 1/3: Initializing keyring (if needed)..."
+    sudo pacman-key --init || {
+        echo "Keyring initialization failed";
+        return 1
+    }
+
+    echo "Step 2/3: Populating archlinux keys..."
+    sudo pacman-key --populate archlinux || {
+        echo "Key population failed";
+        return 1
+    }
+
+    echo "Step 3/3: Updating archlinux-keyring package..."
+    sudo pacman -Sy --needed --noconfirm archlinux-keyring || {
+        echo "Keyring update failed";
+        return 1
+    }
+
+    # 刷新所有密钥
+    echo "Refreshing all keys..."
+    sudo pacman-key --refresh-keys || echo "Key refresh completed with warnings"
+
+    # 恢复原始只读状态
+    if $readonly_was_enabled; then
+        echo "Re-enabling readonly..."
+        sudo steamos-readonly enable
+    fi
+
+    echo "Keyring update completed successfully!"
+    return 0
 }
