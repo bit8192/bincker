@@ -28,6 +28,6 @@ curl -sL "$url" -o "$config_file"
 echo "$url" > "$url_file"
 if systemctl list-units | grep -q "$service_name"; then
     sudo systemctl restart "$service_name"
-else if systemctl list-units | grep -q "mihomo"; then
+elif systemctl list-units | grep -q "mihomo"; then
     sudo systemctl restart mihomo
 fi
