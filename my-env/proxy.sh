@@ -34,7 +34,8 @@ set-proxy() {
   export HTTPS_PROXY="$proxy"
   export ftp_proxy="$proxy"
   export FTP_PROXY="$proxy"
-  export no_proxy="localhost,.local,.internal,127.0.0.1,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12"
+  export no_proxy="localhost,.local,.internal,127.0.0.1,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,::1"
+  export NO_PROXY="$no_proxy"
   set +x
 }
 
