@@ -22,12 +22,11 @@ get-mihomo-socks5-proxy() {
     echo "port not found in config file: $mihomo_cfg_file" >&2
     return 1
   fi
-  echo "socks5://127.0.0.1:$port"
+  echo "socks5h://127.0.0.1:$port"
 }
 
-set-proxy() {
+proxy-set() {
   proxy="$(get-mihomo-socks5-proxy)"
-  set -x
   export http_proxy="$proxy"
   export HTTP_PROXY="$proxy"
   export https_proxy="$proxy"
@@ -36,7 +35,17 @@ set-proxy() {
   export FTP_PROXY="$proxy"
   export no_proxy="localhost,.local,.internal,127.0.0.1,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,::1"
   export NO_PROXY="$no_proxy"
-  set +x
+}
+
+proxy-unset() {
+  unset http_proxy
+  unset HTTP_PROXY
+  unset https_proxy
+  unset HTTPS_PROXY
+  unset ftp_proxy
+  unset FTP_PROXY
+  unset no_proxy
+  unset NO_PROXY
 }
 
 # git

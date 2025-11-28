@@ -5,6 +5,7 @@ else
 fi
 export MY_ENV
 source "$MY_ENV/proxy.sh"
+source "$MY_ENV/editor.sh"
 source "$MY_ENV/update.sh"
 source "$MY_ENV/adb.sh"
 source "$MY_ENV/deck.sh"
