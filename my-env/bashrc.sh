@@ -9,6 +9,7 @@ source "$MY_ENV/editor.sh"
 source "$MY_ENV/update.sh"
 source "$MY_ENV/adb.sh"
 source "$MY_ENV/deck.sh"
+source "$MY_ENV/claude.sh"
 
 export PATH=$PATH:$MY_ENV/scripts
 

@@ -1,4 +1,12 @@
 export ADB_MDNS_AUTO_CONNECT=1
+if [ -z "$ANDROID_HOME" ]; then
+    ANDROID_HOME="$HOME/Android"
+fi
+# 使用AndroidSdk的adb作为服务
+if [ -d "$ANDROID_HOME" ]; then
+    # shellcheck disable=SC2139
+    alias adb="$ANDROID_HOME/Sdk/platform-tools/adb"
+fi
 # 安装apkx包
 function adb_install_apkx() {
     # 检查是否提供了文件路径
