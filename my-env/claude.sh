@@ -159,13 +159,3 @@ EOF
     echo "已创建环境变量文件：$env_file"
     echo "请编辑该文件并填入您的配置"
 }
-
-# 如果直接 source 这个脚本，自动加载环境变量
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-    echo "提示：请使用 'source my-env/claude.sh' 来加载此脚本"
-else
-    # 只在交互式 shell 中自动加载
-    if [[ $- == *i* ]]; then
-        load_claude_env
-    fi
-fi
