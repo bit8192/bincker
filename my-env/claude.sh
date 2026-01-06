@@ -33,13 +33,18 @@ function load_claude_env() {
 
     # 如果只有一个文件，直接使用
     if [ ${#env_files[@]} -eq 1 ]; then
-        local env_file="${env_files[0]}"
+        # 使用 [@]:0:1 语法兼容 bash(索引从0开始) 和 zsh(索引从1开始)
+        local env_file="${env_files[@]:0:1}"
         echo "使用 Claude 环境变量文件：$(basename "$env_file")"
         # 导出环境变量
         set -a
-        source "$env_file"
-        set +a
-        return 0
+        if source "$env_file"; then
+          set +a
+          return 0
+        else
+          set +a
+          return 1
+        fi
     fi
 
     # 如果有多个文件，让用户选择
