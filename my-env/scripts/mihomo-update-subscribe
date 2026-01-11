@@ -24,10 +24,10 @@ if ! command -v curl >/dev/null; then
     exit 1
 fi
 
-curl -sL "$url" -o "$config_file"
-echo "$url" > "$url_file"
+sudo curl -sL "$url" -o "$config_file"
+echo "$url" | sudo tee "$url_file"
 if systemctl list-units | grep -q "$service_name"; then
-    systemctl restart "$service_name"
+    sudo systemctl restart "$service_name"
 elif systemctl list-units | grep -q "mihomo"; then
-    systemctl restart mihomo
+    sudo systemctl restart mihomo
 fi

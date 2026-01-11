@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-get-mihomo-socks5-proxy() {
+mihomo-proxy-addr() {
   cfg_files=("$HOME/.config/clash/config.yaml" "$HOME/.config/mihomo/config.yaml" "/etc/mihomo/config.yaml" "/etc/clash/config.yaml" "/etc/clash-meta/config.yaml")
   for cfg in "${cfg_files[@]}"; do
     if [ -f "$cfg" ]; then
@@ -14,7 +14,7 @@ get-mihomo-socks5-proxy() {
     return 1
   fi
 
-  port="$(grep "mixed-port:" "$mihomo_cfg_file" | awk '{print $2}')"
+  port="$(sudo grep "mixed-port:" "$mihomo_cfg_file" | awk '{print $2}')"
   if [ -z "$port" ]; then
     port="$(grep "socks-port:" "$mihomo_cfg_file" | awk '{print $2}')"
   fi
@@ -22,11 +22,16 @@ get-mihomo-socks5-proxy() {
     echo "port not found in config file: $mihomo_cfg_file" >&2
     return 1
   fi
-  echo "socks5h://127.0.0.1:$port"
+
+  protocol="$1"
+  if [ -z "$protocol" ]; then
+    protocol="socks5h"
+  fi
+  echo "$protocol://127.0.0.1:$port"
 }
 
 proxy-set() {
-  proxy="$(get-mihomo-socks5-proxy)"
+  proxy="$(mihomo-proxy-addr "$@")"
   export http_proxy="$proxy"
   export HTTP_PROXY="$proxy"
   export https_proxy="$proxy"
