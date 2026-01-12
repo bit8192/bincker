@@ -59,7 +59,8 @@ function load_claude_env() {
     # 读取用户选择
     local choice
     while true; do
-        read -p "请输入选项（0-$((${#env_files[@]}))）: " choice
+        echo "请输入选项（0-$((${#env_files[@]}))）: "
+        read -r choice
 
         # 验证输入
         if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 0 ] && [ "$choice" -le ${#env_files[@]} ]; then
@@ -76,7 +77,7 @@ function load_claude_env() {
     fi
 
     # 加载选中的环境变量文件
-    local selected_file="${env_files[$((choice-1))]}"
+    local selected_file="${env_files[@]:$((choice-1)):1}"
     echo "使用 Claude 环境变量文件：$(basename "$selected_file")"
 
     # 导出环境变量
@@ -133,7 +134,8 @@ function claude_create_env() {
     local env_name="$1"
 
     if [ -z "$env_name" ]; then
-        read -p "请输入环境变量文件名（不含 .env 后缀）: " env_name
+        echo "请输入环境变量文件名（不含 .env 后缀）: "
+        read -r env_name
     fi
 
     if [ -z "$env_name" ]; then
@@ -152,7 +154,7 @@ function claude_create_env() {
     cat > "$env_file" << 'EOF'
 # Claude API 配置
 # ANTHROPIC_AUTH_TOKEN=your_api_token_here
-# ANTHROPIC_BASE_URL=your_api_url_hear
+# ANTHROPIC_BASE_URL=your_api_base_url
 
 # 代理配置（如果需要）
 # HTTP_PROXY=http://127.0.0.1:7890
@@ -162,5 +164,6 @@ function claude_create_env() {
 # CLAUDE_MODEL=claude-3-opus-20240229
 EOF
 
-    $EDITOR $env_file
+    echo "已创建环境变量文件：$env_file"
+    $EDITOR "$env_file"
 }
