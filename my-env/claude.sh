@@ -161,7 +161,7 @@ function claude_create_env() {
 # HTTPS_PROXY=http://127.0.0.1:7890
 
 # 其他环境变量
-# CLAUDE_MODEL=claude-3-opus-20240229
+# ANTHROPIC_MODEL=claude-3-opus-20240229
 EOF
 
     echo "已创建环境变量文件：$env_file"

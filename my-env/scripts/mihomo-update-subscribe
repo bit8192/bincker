@@ -24,10 +24,12 @@ if ! command -v curl >/dev/null; then
     exit 1
 fi
 
-sudo curl -sL "$url" -o "$config_file"
+if ! sudo curl -sL "$url" -o "$config_file"; then
+    echo "failed to download config from $url"
+    exit 1
+fi
+
 echo "$url" | sudo tee "$url_file"
 if systemctl list-units | grep -q "$service_name"; then
     sudo systemctl restart "$service_name"
-elif systemctl list-units | grep -q "mihomo"; then
-    sudo systemctl restart mihomo
 fi
