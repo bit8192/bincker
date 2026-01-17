@@ -1,12 +1,7 @@
+if ! command -v adb &>/dev/null; then
+  return
+fi
 export ADB_MDNS_AUTO_CONNECT=1
-if [ -z "$ANDROID_HOME" ]; then
-    ANDROID_HOME="$HOME/Android"
-fi
-# 使用AndroidSdk的adb作为服务
-if [ -d "$ANDROID_HOME" ]; then
-    # shellcheck disable=SC2139
-    alias adb="$ANDROID_HOME/Sdk/platform-tools/adb"
-fi
 # 安装apkx包
 function adb_install_apkx() {
     # 检查是否提供了文件路径
@@ -76,38 +71,4 @@ function adb_install_apkx() {
     rm -rf "$temp_dir"
 
     echo "Installation process completed."
-}
-# scrcpy
-function scrcpy_start() {
-    # 检查 scrcpy 是否已安装
-    if ! command -v scrcpy &> /dev/null; then
-        echo "错误：scrcpy 未安装，请先安装 scrcpy"
-        return 1
-    fi
-
-    # 检查 adb 是否可用
-    if ! command -v adb &> /dev/null; then
-        echo "错误：adb 未找到，请确保 Android SDK 平台工具已安装"
-        return 1
-    fi
-
-    # 检查是否有设备连接
-    local devices
-    devices=$(adb devices | grep -v "List of devices" | grep -v "^$" | wc -l)
-
-    if [ "$devices" -eq 0 ]; then
-        echo "错误：未检测到连接的 ADB 设备"
-        echo "请确保："
-        echo "1. USB 调试已开启"
-        echo "2. 设备已正确连接"
-        echo "3. 已授权电脑的调试请求"
-        return 1
-    fi
-
-    # 显示连接的设备信息
-    echo "检测到 $devices 个设备，启动 scrcpy..."
-    adb devices | grep -v "List of devices" | grep -v "^$"
-
-    # 启动 scrcpy
-    scrcpy
 }

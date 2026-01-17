@@ -1,4 +1,7 @@
 myenv_update() {
+  if ! command -v git &>/dev/null; then
+    return
+  fi
   local LAST_CHECK_FILE="$MY_ENV/.last_update_available_check"
   _check_update_available(){
     local CHECK_INTERVAL=86400

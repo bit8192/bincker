@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 mihomo-proxy-addr() {
+  local protocol="$1"
+  if [ -z "$protocol" ]; then
+    protocol="socks5h"
+  fi
+  local default_port="7890"
+  local port="$default_port"
+  local result="$protocol://127.0.0.1:$port"
   cfg_files=("$HOME/.config/clash/config.yaml" "$HOME/.config/mihomo/config.yaml" "/etc/mihomo/config.yaml" "/etc/clash/config.yaml" "/etc/clash-meta/config.yaml")
   for cfg in "${cfg_files[@]}"; do
     if [ -f "$cfg" ]; then
@@ -10,8 +17,8 @@ mihomo-proxy-addr() {
   done
 
   if [ -z "$mihomo_cfg_file" ] || [ ! -f "$mihomo_cfg_file" ]; then
-    echo "mihomo config file not found." >&2
-    return 1
+    echo "mihomo config file not found. use default: $result" >&2
+    echo $result
   fi
 
   port="$(sudo grep "mixed-port:" "$mihomo_cfg_file" | awk '{print $2}')"
@@ -19,13 +26,8 @@ mihomo-proxy-addr() {
     port="$(grep "socks-port:" "$mihomo_cfg_file" | awk '{print $2}')"
   fi
   if [ -z "$port" ]; then
-    echo "port not found in config file: $mihomo_cfg_file" >&2
-    return 1
-  fi
-
-  protocol="$1"
-  if [ -z "$protocol" ]; then
-    protocol="socks5h"
+    echo "port not found in config file: $mihomo_cfg_file, use default port: $default_port" >&2
+    echo "$protocol://127.0.0.1:$default_port"
   fi
   echo "$protocol://127.0.0.1:$port"
 }
@@ -54,6 +56,6 @@ proxy-unset() {
 }
 
 # git
-if ! git config --global --get http.https://github.com/.proxy > /dev/null; then
+if command -v git &>/dev/null && ! git config --global --get http.https://github.com/.proxy > /dev/null; then
   git config --global --add http.https://github.com/.proxy "$(get-mihomo-socks5-proxy)"
 fi
