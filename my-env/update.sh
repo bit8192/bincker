@@ -7,7 +7,7 @@ myenv_update() {
     local CHECK_INTERVAL=86400
     if [ ! -f "$LAST_CHECK_FILE" ] || [ $(($(date +%s) - $(date -r "$LAST_CHECK_FILE" +%s))) -gt $CHECK_INTERVAL ]; then
       cd "$MY_ENV/.." || return 1
-      if git fetch --quiet 2>/dev/null; then
+      if timeout 10 git fetch --quiet 2>/dev/null; then
         if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
           return 0
         fi
@@ -18,7 +18,7 @@ myenv_update() {
 
   _update() {
     cd "$MY_ENV/.." || return
-    git fetch
+    timeout 10 git fetch
 
     if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
       git diff --stat HEAD..origin/master

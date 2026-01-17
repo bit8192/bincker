@@ -19,15 +19,17 @@ mihomo-proxy-addr() {
   if [ -z "$mihomo_cfg_file" ] || [ ! -f "$mihomo_cfg_file" ]; then
     echo "mihomo config file not found. use default: $result" >&2
     echo $result
+    return
   fi
 
   port="$(sudo grep "mixed-port:" "$mihomo_cfg_file" | awk '{print $2}')"
   if [ -z "$port" ]; then
-    port="$(grep "socks-port:" "$mihomo_cfg_file" | awk '{print $2}')"
+    port="$(sudo grep "socks-port:" "$mihomo_cfg_file" | awk '{print $2}')"
   fi
   if [ -z "$port" ]; then
     echo "port not found in config file: $mihomo_cfg_file, use default port: $default_port" >&2
     echo "$protocol://127.0.0.1:$default_port"
+    return
   fi
   echo "$protocol://127.0.0.1:$port"
 }
@@ -56,6 +58,6 @@ proxy-unset() {
 }
 
 # git
-if command -v git &>/dev/null && ! git config --global --get http.https://github.com/.proxy > /dev/null; then
-  git config --global --add http.https://github.com/.proxy "$(get-mihomo-socks5-proxy)"
+if command -v git &>/dev/null && [ -z "$(git config --global --get http.https://github.com/.proxy)" ]; then
+  git config --global --add http.https://github.com/.proxy "$(mihomo-proxy-addr)"
 fi
