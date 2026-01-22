@@ -1,0 +1,18 @@
+{{ define "layout_post.html" }}
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    {{ template "partials_head" . }}
+  </head>
+  <body class="min-h-screen bg-ink text-sand">
+    <div class="page-shell">
+      <div class="grain"></div>
+      {{ template "partials_site_header" . }}
+
+      {{ template "post-content" . }}
+
+      {{ template "partials_site_footer" . }}
+    </div>
+  </body>
+</html>
+{{ end }}

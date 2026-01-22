@@ -3,7 +3,7 @@ set -e
 
 METHOD="$1"
 SERVER_HOST="$2"
-LOCAL_BLOG_PATH="blog"
+LOCAL_BLOG_PATH="blog/post"
 REMOTE_BLOG_PATH="/opt/bincker/blog"
 
 function usage() {
