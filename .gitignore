@@ -39,7 +39,6 @@ out/
 
 src/main/resources/application-local.yml
 database.db
-/blog/
 my-env/.last_update_available_check
 my-env/claude/env/*
 remember-me.key

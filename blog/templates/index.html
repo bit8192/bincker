@@ -1,0 +1,53 @@
+{{ define "index.html" }}
+  {{ template "layout.html" . }}
+{{ end }}
+
+{{ define "index-content" }}
+<main class="mx-auto w-full max-w-6xl px-6 pb-16">
+  <section class="hero-grid">
+    <div class="hero-card fade-rise" style="animation-delay: 80ms;">
+      <p class="eyebrow">写作与构建</p>
+      <h1 class="hero-title">一个被灵感驱动的 Go 博客底座</h1>
+      <p class="hero-text">静态资源、ORM、SQLite 与 Markdown 渲染已经就位，现在只差你的文字。</p>
+      <div class="flex flex-wrap gap-3 text-xs uppercase tracking-[0.25em] text-sand/70">
+        <span class="tag">GIN</span>
+        <span class="tag">GORM</span>
+        <span class="tag">SQLITE</span>
+        <span class="tag">TAILWIND</span>
+      </div>
+    </div>
+    <div class="hero-side fade-rise" style="animation-delay: 180ms;">
+      <div class="highlight-panel">
+        <p class="panel-title">今日灵感</p>
+        <p class="panel-text">写作的速度，比工具更重要。</p>
+        <p class="panel-meta">建议：把第一篇文章写进 `content/`</p>
+      </div>
+      <div class="highlight-panel alt">
+        <p class="panel-title">技术焦点</p>
+        <ul class="panel-list">
+          <li>Markdown 转 HTML 后储存</li>
+          <li>SQLite 轻量化存储</li>
+          <li>模板与静态资源分离</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-14 space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">最新文章</h2>
+      <span class="section-meta">共 {{ len .Posts }} 篇</span>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+      {{ range .Posts }}
+      <article class="post-card fade-rise" style="animation-delay: 200ms;">
+        <p class="post-meta">{{ .ModifiedAt.Format "2006-01-02" }}</p>
+        <h3 class="post-title">{{ .Title }}</h3>
+        <p class="post-summary">{{ .Summary }}</p>
+        <a class="post-link" href="/post/{{ .Path }}">阅读全文 →</a>
+      </article>
+      {{ end }}
+    </div>
+  </section>
+</main>
+{{ end }}

@@ -1,0 +1,19 @@
+{{ define "post.html" }}
+  {{ template "layout_post.html" . }}
+{{ end }}
+
+{{ define "post-content" }}
+<main class="mx-auto w-full max-w-5xl px-6 pb-16">
+  <a class="back-link" href="/">← 返回主页</a>
+  <article class="post-shell">
+    <header class="post-header">
+      <p class="post-meta">{{ .Post.ModifiedAt.Format "2006-01-02" }}</p>
+      <h1 class="post-heading">{{ .Post.Title }}</h1>
+      <p class="post-summary">{{ .Post.Summary }}</p>
+    </header>
+    <div class="markdown-body">
+      {{ .Post.ContentHTML | safeHTML }}
+    </div>
+  </article>
+</main>
+{{ end }}
