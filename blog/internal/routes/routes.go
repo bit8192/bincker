@@ -26,6 +26,9 @@ func Register(router *gin.Engine, store *content.Store, database *gorm.DB) {
 
 	handler := handlers.Handler{Store: store, Db: database}
 	router.GET("/", handler.Home)
+	router.GET("/about", handler.About)
+	router.GET("/works", handler.WorksList)
+	router.GET("/works/:slug", handler.WorkDetail)
 	router.GET("/post/*slug", staticHandler("./post", handler.PostDetail))
 	router.GET("/static/*filepath", staticHandler("./static", handlers.NotFound))
 	router.HEAD("/static/*filepath", staticHandler("./static", handlers.NotFound))

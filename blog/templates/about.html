@@ -1,0 +1,131 @@
+{{ define "about.html" }}
+  {{ template "layout_about.html" . }}
+{{ end }}
+
+{{ define "about-content" }}
+<main class="mx-auto w-full max-w-6xl px-6 pb-20">
+  <section class="about-hero">
+    <div class="about-hero-card fade-rise" style="--delay: 60ms;">
+      <p class="eyebrow">关于系统</p>
+      <h1 class="about-title">以文字为核心的轻量发布系统</h1>
+      <p class="about-lead">
+        这是一个围绕写作体验构建的 Go 博客底座。它强调速度、结构与可持续维护：
+        把复杂交给框架，把节奏还给作者。
+      </p>
+      <div class="about-badges">
+        <span class="badge-chip">内容优先</span>
+        <span class="badge-chip">低摩擦</span>
+        <span class="badge-chip">可演进</span>
+      </div>
+      <div class="about-quote">
+        <p class="about-quote-text">“让每一次发布，都像写下一行确定的判断。”</p>
+        <p class="about-quote-meta">— Bincker博客 · 设计语句</p>
+      </div>
+    </div>
+    <div class="about-hero-side fade-rise" style="--delay: 140ms;">
+      <div class="manifest-card">
+        <p class="panel-title">设计原则</p>
+        <h3 class="manifest-title">轻量但不轻浮</h3>
+        <p class="manifest-text">系统以最少的层级组织功能，保留可拓展的接口与结构。</p>
+      </div>
+      <div class="manifest-card alt">
+        <p class="panel-title">写作观</p>
+        <h3 class="manifest-title">内容是主角</h3>
+        <p class="manifest-text">页面让文字先行，视觉用于建立节奏与注意力锚点。</p>
+      </div>
+      <div class="manifest-card signal">
+        <p class="panel-title">技术观</p>
+        <h3 class="manifest-title">稳固且可理解</h3>
+        <p class="manifest-text">Gin + GORM + SQLite 让架构稳定、易读、易维护。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-16 space-y-8">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">系统理念</h2>
+      <span class="section-meta">设计思路</span>
+    </div>
+    <div class="principle-grid">
+      <article class="principle-card fade-rise" style="--delay: 200ms;">
+        <span class="principle-index">01</span>
+        <h3 class="principle-title">速度是第一体验</h3>
+        <p class="principle-text">从启动到渲染保持短路径，让写作流程不被打断。</p>
+      </article>
+      <article class="principle-card fade-rise" style="--delay: 240ms;">
+        <span class="principle-index">02</span>
+        <h3 class="principle-title">结构清晰胜过魔法</h3>
+        <p class="principle-text">模块命名直观，关注点分离，边界明确。</p>
+      </article>
+      <article class="principle-card fade-rise" style="--delay: 280ms;">
+        <span class="principle-index">03</span>
+        <h3 class="principle-title">写作节奏优先</h3>
+        <p class="principle-text">界面服务于阅读节奏，用对比与留白建立呼吸感。</p>
+      </article>
+      <article class="principle-card fade-rise" style="--delay: 320ms;">
+        <span class="principle-index">04</span>
+        <h3 class="principle-title">可维护是长期价值</h3>
+        <p class="principle-text">依赖少、逻辑集中，让项目能长期演进。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="mt-16 space-y-8">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">体验流程</h2>
+      <span class="section-meta">从内容到发布</span>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item fade-rise" style="--delay: 220ms;">
+        <span class="timeline-marker">A</span>
+        <div>
+          <h3 class="timeline-title">写作</h3>
+          <p class="timeline-text">使用 Markdown 记录观点，摘要作为内容基调。</p>
+        </div>
+      </div>
+      <div class="timeline-item fade-rise" style="--delay: 260ms;">
+        <span class="timeline-marker">B</span>
+        <div>
+          <h3 class="timeline-title">整理</h3>
+          <p class="timeline-text">系统读取 `post/` 目录并生成可用的内容索引。</p>
+        </div>
+      </div>
+      <div class="timeline-item fade-rise" style="--delay: 300ms;">
+        <span class="timeline-marker">C</span>
+        <div>
+          <h3 class="timeline-title">发布</h3>
+          <p class="timeline-text">SQLite 记录元数据，模板渲染形成最终页面。</p>
+        </div>
+      </div>
+      <div class="timeline-item fade-rise" style="--delay: 340ms;">
+        <span class="timeline-marker">D</span>
+        <div>
+          <h3 class="timeline-title">复盘</h3>
+          <p class="timeline-text">持续调整结构与样式，让内容库逐步稳定。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-16 space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">关键取舍</h2>
+      <span class="section-meta">技术与体验</span>
+    </div>
+    <div class="about-panels">
+      <div class="about-panel fade-rise" style="--delay: 240ms;">
+        <p class="panel-title">轻依赖</p>
+        <p class="about-panel-text">保持可读的依赖关系，尽量避免复杂的外部构建链。</p>
+      </div>
+      <div class="about-panel fade-rise" style="--delay: 280ms;">
+        <p class="panel-title">可控节奏</p>
+        <p class="about-panel-text">以模板驱动统一视觉语言，让文章展示稳定一致。</p>
+      </div>
+      <div class="about-panel fade-rise" style="--delay: 320ms;">
+        <p class="panel-title">可扩展</p>
+        <p class="about-panel-text">模块化目录结构，允许后续接入新功能。</p>
+      </div>
+    </div>
+  </section>
+</main>
+{{ end }}

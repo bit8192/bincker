@@ -1,0 +1,69 @@
+{{ define "works.html" }}
+  {{ template "layout_work.html" . }}
+{{ end }}
+
+{{ define "work-content" }}
+<main class="mx-auto w-full max-w-6xl px-6 pb-20">
+  <section class="works-hero">
+    <div class="works-hero-card fade-rise" style="--delay: 80ms;">
+      <p class="eyebrow">作品列表</p>
+      <h1 class="works-title">呈现系统性的作品与实验</h1>
+      <p class="works-lead">每个项目都是一次结构探索：从内容模型到视觉节奏，再到可维护的技术落地。</p>
+      <div class="works-meta">
+        <div>
+          <p class="metric-value">{{ len .Works }}</p>
+          <p class="metric-label">累计作品</p>
+        </div>
+        <div>
+          <p class="metric-value">系统</p>
+          <p class="metric-label">驱动视角</p>
+        </div>
+        <div>
+          <p class="metric-value">持续更新</p>
+          <p class="metric-label">2023-2024</p>
+        </div>
+      </div>
+    </div>
+    <div class="works-hero-side fade-rise" style="--delay: 160ms;">
+      <div class="highlight-panel">
+        <p class="panel-title">焦点策略</p>
+        <p class="panel-text">以结构化叙事驱动产品体验。</p>
+        <p class="panel-meta">从框架到交互保持统一语言。</p>
+      </div>
+      <div class="highlight-panel alt">
+        <p class="panel-title">评估标准</p>
+        <ul class="panel-list">
+          <li>流程是否顺滑</li>
+          <li>界面是否易读</li>
+          <li>数据是否可追溯</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-16 space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">作品清单</h2>
+      <span class="section-meta">点击查看详情</span>
+    </div>
+    <div class="works-grid">
+      {{ range .Works }}
+      <article class="work-card fade-rise" style="--delay: 220ms;">
+        <div class="work-card-top">
+          <span class="work-tag">{{ .Category }}</span>
+          <span class="work-year">{{ .Year }}</span>
+        </div>
+        <h3 class="work-title">{{ .Title }}</h3>
+        <p class="work-summary">{{ .Summary }}</p>
+        <div class="work-tags">
+          {{ range .Tags }}
+          <span>{{ . }}</span>
+          {{ end }}
+        </div>
+        <a class="work-link" href="/works/{{ .Slug }}">查看详情 →</a>
+      </article>
+      {{ end }}
+    </div>
+  </section>
+</main>
+{{ end }}

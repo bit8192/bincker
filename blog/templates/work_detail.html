@@ -1,0 +1,78 @@
+{{ define "work_detail.html" }}
+  {{ template "layout_work.html" . }}
+{{ end }}
+
+{{ define "work-content" }}
+<main class="mx-auto w-full max-w-5xl px-6 pb-20">
+  <a class="back-link" href="/works">← 返回作品列表</a>
+
+  <section class="work-detail-hero fade-rise" style="--delay: 80ms;">
+    <div class="work-detail-header">
+      <p class="work-detail-category">{{ .Work.Category }}</p>
+      <span class="work-detail-year">{{ .Work.Year }}</span>
+    </div>
+    <h1 class="work-detail-title">{{ .Work.Title }}</h1>
+    <p class="work-detail-summary">{{ .Work.Summary }}</p>
+    <div class="work-detail-meta">
+      <div>
+        <p class="metric-label">角色</p>
+        <p class="metric-value">{{ .Work.Role }}</p>
+      </div>
+      <div>
+        <p class="metric-label">方向</p>
+        <p class="metric-value">{{ .Work.Category }}</p>
+      </div>
+      <div>
+        <p class="metric-label">年份</p>
+        <p class="metric-value">{{ .Work.Year }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-12 work-detail-grid">
+    <article class="work-detail-card fade-rise" style="--delay: 180ms;">
+      <p class="panel-title">设计命题</p>
+      <h3 class="detail-title">以内容为中心的系统化表达</h3>
+      <p class="detail-text">围绕写作行为设计结构，确保内容在不同阶段都能快速被定位和复用。</p>
+    </article>
+    <article class="work-detail-card fade-rise" style="--delay: 220ms;">
+      <p class="panel-title">视觉策略</p>
+      <h3 class="detail-title">层级与节奏清晰</h3>
+      <p class="detail-text">使用对比、留白与装饰性纹理建立阅读节奏，弱化噪声干扰。</p>
+    </article>
+    <article class="work-detail-card fade-rise" style="--delay: 260ms;">
+      <p class="panel-title">系统结构</p>
+      <h3 class="detail-title">模块化与可扩展</h3>
+      <p class="detail-text">保留扩展接口，后续可引入搜索、标签体系或数据同步。</p>
+    </article>
+  </section>
+
+  <section class="mt-12">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">关键词</h2>
+      <span class="section-meta">项目标签</span>
+    </div>
+    <div class="work-detail-tags">
+      {{ range .Work.Tags }}
+      <span>{{ . }}</span>
+      {{ end }}
+    </div>
+  </section>
+
+  <section class="mt-12">
+    <div class="flex items-center justify-between">
+      <h2 class="section-title">更多作品</h2>
+      <span class="section-meta">保持探索</span>
+    </div>
+    <div class="works-mini-grid">
+      {{ range .Works }}
+      <a class="works-mini-card" href="/works/{{ .Slug }}">
+        <p class="work-tag">{{ .Category }}</p>
+        <h3>{{ .Title }}</h3>
+        <p>{{ .Summary }}</p>
+      </a>
+      {{ end }}
+    </div>
+  </section>
+</main>
+{{ end }}

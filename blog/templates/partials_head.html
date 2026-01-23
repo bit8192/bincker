@@ -1,11 +1,29 @@
 {{ define "partials_head" }}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ .Title }} | 光尘博客</title>
+<title>{{ .Title }} | Bincker</title>
 <meta name="description" content="{{ .Description }}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/static/favicon.png" />
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="/static/css/app.css">
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const path = window.location.pathname || "/";
+    let navKey = "";
+    if (path === "/" || path.indexOf("/post/") === 0) {
+      navKey = "home";
+    } else if (path.indexOf("/works") === 0) {
+      navKey = "works";
+    } else if (path.indexOf("/about") === 0) {
+      navKey = "about";
+    }
+    if (!navKey) {
+      return;
+    }
+    const active = document.querySelector('[data-nav="' + navKey + '"]');
+    if (active) {
+      active.classList.add("active");
+    }
+  });
+</script>
 {{ end }}
