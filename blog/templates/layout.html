@@ -1,8 +1,33 @@
-{{ define "layout.html" }}
 <!doctype html>
 <html lang="zh-CN">
   <head>
-    {{ template "partials_head" . }}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ .Title }} | Bincker</title>
+    <meta name="description" content="{{ .Description }}">
+    <link rel="icon" type="image/png" href="/static/favicon.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/app.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const path = window.location.pathname || "/";
+            let navKey = "";
+            if (path === "/" || path.indexOf("/post/") === 0) {
+                navKey = "home";
+            } else if (path.indexOf("/works") === 0) {
+                navKey = "works";
+            } else if (path.indexOf("/about") === 0) {
+                navKey = "about";
+            }
+            if (!navKey) {
+                return;
+            }
+            const active = document.querySelector('[data-nav="' + navKey + '"]');
+            if (active) {
+                active.classList.add("active");
+            }
+        });
+    </script>
   </head>
   <body class="min-h-screen bg-ink text-sand">
     <div class="page-shell">
@@ -16,13 +41,34 @@
       </div>
       <div class="grain"></div>
       <div class="page-content">
-        {{ template "partials_site_header" . }}
+        <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-10">
+          <div class="flex items-center gap-3">
+            <span class="brand-mark"></span>
+            <div>
+              <p class="brand-title">Bincker</p>
+              <p class="brand-sub">用逻辑解构世界，用代码搭建理想</p>
+            </div>
+          </div>
+          <nav class="hidden gap-6 text-sm uppercase tracking-[0.2em] md:flex">
+            <a class="nav-pill" href="/" data-nav="home">文章</a>
+            <a class="nav-pill" href="/works" data-nav="works">作品</a>
+            <a class="nav-pill" href="/about" data-nav="about">关于</a>
+          </nav>
+        </header>
 
-        {{ template "index-content" . }}
+        {{ block "content" . }}{{end}}
 
-        {{ template "partials_site_footer" . }}
+        <footer class="mx-auto w-full max-w-6xl px-6 pb-14 pt-10 text-xs text-sand/70">
+          <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <span>© {{ .Now.Year }} Bincker · 文字驱动的轻量日志</span>
+            <a class="inline-flex items-center justify-center text-sand/70 hover:text-sand transition" href="https://github.com/bit8192/bincker.git" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
+                <path d="M12 0.3c-6.63 0-12 5.37-12 12 0 5.3 3.438 9.8 8.205 11.385.6.111.82-.261.82-.58 0-.287-.01-1.045-.016-2.052-3.338.725-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.236 1.84 1.236 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.76-1.605-2.665-.304-5.466-1.332-5.466-5.93 0-1.31.469-2.381 1.235-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.3 1.23.958-.266 1.984-.399 3.006-.404 1.022.005 2.048.138 3.008.404 2.29-1.552 3.296-1.23 3.296-1.23.653 1.653.242 2.873.118 3.176.768.84 1.233 1.911 1.233 3.221 0 4.61-2.806 5.624-5.479 5.921.43.371.814 1.102.814 2.222 0 1.604-.014 2.896-.014 3.286 0 .321.216.694.825.576 4.765-1.586 8.199-6.085 8.199-11.383 0-6.63-5.373-12-12-12z"/>
+              </svg>
+            </a>
+          </div>
+        </footer>
       </div>
     </div>
   </body>
 </html>
-{{ end }}

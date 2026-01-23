@@ -1,8 +1,4 @@
-{{ define "works.html" }}
-  {{ template "layout_work.html" . }}
-{{ end }}
-
-{{ define "work-content" }}
+{{ define "content" }}
 <main class="mx-auto w-full max-w-6xl px-6 pb-20">
   <section class="works-hero">
     <div class="works-hero-card fade-rise" style="--delay: 80ms;">
@@ -67,3 +63,4 @@
   </section>
 </main>
 {{ end }}
+{{ template "layout" . }}

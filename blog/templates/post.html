@@ -1,8 +1,4 @@
-{{ define "post.html" }}
-  {{ template "layout_post.html" . }}
-{{ end }}
-
-{{ define "post-content" }}
+{{ define "content" }}
 <main class="mx-auto w-full max-w-5xl px-6 pb-16">
   <a class="back-link" href="/">← 返回主页</a>
   <article class="post-shell">
@@ -17,3 +13,4 @@
   </article>
 </main>
 {{ end }}
+{{ template "layout" . }}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="WSL - archlinux" type="wsl" uuid="29e4834b-b37d-492a-86f6-c69f70275eeb">
+        <config>
+          <option name="distributionMsId" value="archlinux" />
+          <option name="projectRootOnTarget" value="{exitCode=0, timeout=false, cancelled=false, stdout=/tmp/tmp.W15sMZsdSi&#13;&#10;, stderr=}/bincker" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goPath" value="/home/bincker/go" />
+            <option name="goRoot" value="/usr/sbin/go" />
+            <option name="goVersion" value="go1.25.6 X:nodwarf5 linux/amd64" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

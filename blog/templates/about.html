@@ -1,8 +1,4 @@
-{{ define "about.html" }}
-  {{ template "layout_about.html" . }}
-{{ end }}
-
-{{ define "about-content" }}
+{{ define "content" }}
 <main class="mx-auto w-full max-w-6xl px-6 pb-20">
   <section class="about-hero">
     <div class="about-hero-card fade-rise" style="--delay: 60ms;">
@@ -129,3 +125,4 @@
   </section>
 </main>
 {{ end }}
+{{ template "layout" . }}

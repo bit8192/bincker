@@ -24,7 +24,7 @@ if ! command -v curl >/dev/null; then
     exit 1
 fi
 
-if ! sudo curl -sL "$url" -o "$config_file"; then
+if ! sudo curl -sfL "$url" -o "$config_file"; then
     echo "failed to download config from $url"
     exit 1
 fi

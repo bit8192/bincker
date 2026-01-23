@@ -1,8 +1,4 @@
-{{ define "work_detail.html" }}
-  {{ template "layout_work.html" . }}
-{{ end }}
-
-{{ define "work-content" }}
+{{ define "content" }}
 <main class="mx-auto w-full max-w-5xl px-6 pb-20">
   <a class="back-link" href="/works">← 返回作品列表</a>
 
@@ -76,3 +72,4 @@
   </section>
 </main>
 {{ end }}
+{{ template "layout" . }}
