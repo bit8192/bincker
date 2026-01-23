@@ -45,6 +45,7 @@ public class BlogController {
     @GetMapping
     public String index(Page<Blog> page, String keywords, Model model) {
         model.addAttribute("page", blogService.getPage(page, keywords));
+        model.addAttribute("keywords", keywords);
         return "blog/index";
     }
 

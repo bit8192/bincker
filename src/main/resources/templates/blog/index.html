@@ -4,19 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>博客</title>
+    <script>document.documentElement.classList.add('js');</script>
     <th:block th:insert="~{common/basic :: css}"/>
+    <link rel="stylesheet" href="/css/blog.css">
     <th:block th:insert="~{common/basic :: js}"/>
 </head>
-<body>
+<body class="theme-blog">
 <th:block th:insert="~{common/basic :: nav}"/>
-<main class="container-xxl">
-    <ul class="p-3 list-unstyled">
-        <li th:each="blog : ${page.getRecords()}" class="mb-4 d-flex justify-content-between">
-            <a th:text="${blog.getTitle()}" th:href="@{'/blog/' + ${blog.getFilePath()}}" class="text-body h5">Title</a>
-            <span class="text-secondary" th:text="${#dates.format(blog.getFileCreatedTime(), 'yyyy-MM-dd')}" style="font-size: 0.8rem"></span>
-        </li>
-    </ul>
+<main class="container-xxl blog-shell">
+    <section class="blog-hero" data-animate>
+        <div class="blog-eyebrow">Blog</div>
+        <h1 class="blog-title blog-display">博客</h1>
+        <p class="blog-subtitle">记录想法、代码与折腾过程。这里的每篇文章都尽量写得清晰、可复现。</p>
+        <form class="blog-search" method="get" action="/blog">
+            <input name="keywords" th:value="${keywords}" placeholder="搜索标题 / 内容关键字">
+            <button type="submit">搜索</button>
+        </form>
+    </section>
+
+    <section class="blog-list">
+        <div class="blog-empty" th:if="${#lists.isEmpty(page.getRecords())}">暂无内容，换个关键词试试。</div>
+        <article th:each="blog : ${page.getRecords()}" class="blog-card" data-animate>
+            <a th:text="${blog.getTitle()}" th:href="@{'/blog/' + ${blog.getFilePath()}}" class="blog-card__title">Title</a>
+            <div class="blog-card__meta">
+                <span class="blog-chip">
+                    <i class="bi bi-calendar2-week"></i>
+                    <span th:text="${#dates.format(blog.getFileCreatedTime(), 'yyyy-MM-dd')}">2024-01-01</span>
+                </span>
+                <span th:text="${blog.getViews()} + ' 次阅读'">0 次阅读</span>
+            </div>
+        </article>
+    </section>
+
+    <nav class="blog-pagination" aria-label="分页" th:if="${page.getPages() > 1}">
+        <a class="blog-page-btn"
+           th:classappend="${page.getCurrent() == 1} ? ' is-disabled' : ''"
+           th:href="@{/blog(current=${page.getCurrent() - 1}, size=${page.getSize()}, keywords=${keywords})}">上一页</a>
+        <div class="blog-page-info" th:text="|第 ${page.getCurrent()} / ${page.getPages()} 页|">第 1 / 1 页</div>
+        <a class="blog-page-btn"
+           th:classappend="${page.getCurrent() == page.getPages()} ? ' is-disabled' : ''"
+           th:href="@{/blog(current=${page.getCurrent() + 1}, size=${page.getSize()}, keywords=${keywords})}">下一页</a>
+    </nav>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
+<script src="/js/blog-ui.js" defer></script>
 </body>
 </html>

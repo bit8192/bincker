@@ -4,38 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${blog.getTitle()}">Blog Title</title>
+    <script>document.documentElement.classList.add('js');</script>
     <th:block th:insert="~{common/basic :: css}" />
+    <link rel="stylesheet" href="/css/blog.css">
     <th:block th:insert="~{common/basic :: js}" />
 </head>
-<body>
+<body class="theme-blog">
 <th:block th:insert="~{common/basic :: nav (autohide = true)}"/>
-<main class="container-xxl">
-<p th:utext="*{content}">
-    content
-</p>
-    <hr />
-    <div class="text-secondary pb-3">
-        <i class="bi bi-eye"></i>
-        <span th:text="${blog.getViews()}">0</span>
-        |
-        <a id="btn-like" class="icon-link icon-link-hover link-secondary text-decoration-none" href="javascript:void(0)" style="--bs-icon-link-transform: translate3d(0, -.25rem, 0);">
-            <i class="bi bi-heart"></i>
-        </a>
-        <span th:text="${blog.getLikes()}">0</span>
-        |
-        <a class="icon-link icon-link-hover link-secondary text-decoration-none" href="javascript:void(0)" style="--bs-icon-link-transform: translate3d(0, -.25rem, 0);">
-            <i class="bi bi-share"></i>
-        </a>
-        <span th:text="${blog.getShares()}">0</span>
-        |
-        <i class="bi bi-upload"></i>
-        <span th:text="${#dates.format(blog.getFileCreatedTime(), 'yyyy-MM-dd HH:mm:ss')}">2024-08-07 00:00:00</span>
-        |
-        <i class="bi bi-pencil"></i>
-        <span th:text="${#dates.format(blog.getFileLastModified(), 'yyyy-MM-dd HH:mm:ss')}">2024-08-07 00:00:00</span>
+<div class="blog-progress" aria-hidden="true">
+    <div class="blog-progress__bar" id="blog-progress-bar"></div>
+</div>
+<main class="container-xxl blog-shell">
+    <header class="blog-article-header" data-animate>
+        <div class="blog-eyebrow">Blog</div>
+        <h1 class="blog-title blog-display" th:text="${blog.getTitle()}">Blog Title</h1>
+        <div class="blog-article-meta">
+            <span class="blog-chip">
+                <i class="bi bi-calendar2-week"></i>
+                <span th:text="${#dates.format(blog.getFileCreatedTime(), 'yyyy-MM-dd HH:mm')}">2024-08-07 00:00</span>
+            </span>
+            <span class="blog-chip">
+                <i class="bi bi-pencil"></i>
+                <span th:text="${#dates.format(blog.getFileLastModified(), 'yyyy-MM-dd HH:mm')}">2024-08-07 00:00</span>
+            </span>
+            <span class="blog-chip">
+                <i class="bi bi-eye"></i>
+                <span th:text="${blog.getViews()}">0</span>
+            </span>
+        </div>
+    </header>
+
+    <div class="blog-layout">
+        <article class="blog-article" id="blog-article" th:utext="*{content}">content</article>
+        <aside class="blog-toc" aria-label="目录" data-animate>
+            <div class="blog-toc__title">目录</div>
+            <nav id="blog-toc"></nav>
+        </aside>
+    </div>
+
+    <div class="blog-actions" data-animate>
+        <div class="blog-actions__group">
+            <span>喜欢 / 分享一下？</span>
+        </div>
+        <div class="blog-actions__group">
+            <a id="btn-like" class="blog-action-btn" href="javascript:void(0)">
+                <i class="bi bi-heart"></i>
+                <span th:text="${blog.getLikes()}">0</span>
+            </a>
+            <a id="btn-share" class="blog-action-btn" href="javascript:void(0)">
+                <i class="bi bi-share"></i>
+                <span th:text="${blog.getShares()}">0</span>
+            </a>
+        </div>
     </div>
 </main>
 <th:block th:insert="~{common/basic :: footer}"/>
+<script src="/js/blog-ui.js" defer></script>
 <script th:inline="javascript">
     (function(){
         $.post({
@@ -46,18 +70,40 @@
 
         $("#btn-like").click(function () {
             if ($(this).children("i").hasClass("bi-heart-fill")) return;
-            console.log($(this))
             $.post({
                 url: location.pathname,
                 contentType: "application/json",
                 data: JSON.stringify({type: 'LIKE'}),
                 success: ()=>{
                     $(this).children("i").removeClass("bi-heart").addClass("bi-heart-fill");
-                    const span = $(this).next();
+                    const span = $(this).find("span");
                     span.text(+span.text() + 1);
                 }
             });
-        })
+        });
+
+        $("#btn-share").click(function () {
+            $.post({
+                url: location.pathname,
+                contentType: "application/json",
+                data: JSON.stringify({type: 'SHARE'}),
+                success: async ()=>{
+                    const span = $(this).find("span");
+                    span.text(+span.text() + 1);
+
+                    const title = /*[[${blog.getTitle()}]]*/ document.title;
+                    try {
+                        if (navigator.share) {
+                            await navigator.share({ title, url: location.href });
+                        } else if (navigator.clipboard) {
+                            await navigator.clipboard.writeText(location.href);
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+            });
+        });
     })();
 </script>
 </body>
