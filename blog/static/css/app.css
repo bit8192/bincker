@@ -68,7 +68,7 @@ body {
   filter: blur(0);
   opacity: 0.7;
   mix-blend-mode: screen;
-  animation: float 14s ease-in-out infinite;
+  animation: float 5s ease-in-out infinite;
 }
 
 .orb-1 {
@@ -1091,7 +1091,7 @@ body {
   }
 }
 
-@keyframes beam {
+@keyframes beam-1 {
   0%,
   100% {
     opacity: 0.25;
@@ -1100,6 +1100,18 @@ body {
   50% {
     opacity: 0.6;
     transform: translateX(24px) rotate(var(--beam-rotate));
+  }
+}
+
+@keyframes beam {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: rotate(var(--beam-rotate)) translateX(0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: rotate(var(--beam-rotate)) translateX(256px);
   }
 }
 

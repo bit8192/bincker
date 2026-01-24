@@ -22,6 +22,11 @@
 - code comments use Chinese
 - title and description use Chinese
 
+## Implementation methods and plans
+- You should focus more on adhering to best practices and the art of coding, rather than merely achieving the goal at any cost.
+- When you realize that the demand is unreasonable, you should raise questions.
+- When you have a better implementation plan, you should put forward your suggestions.
+
 ## Testing Guidelines
 - Frameworks: JUnit 5 + Spring Boot Test.
 - Test classes live in `src/test/java` and end with `Test` (e.g., `DatabaseSchemaSynchronizerTest`).

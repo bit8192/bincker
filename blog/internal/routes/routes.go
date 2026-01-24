@@ -63,6 +63,7 @@ func staticHandler(root string, f gin.HandlerFunc) gin.HandlerFunc {
 		".js":   {},
 		".gz":   {},
 		".xz":   {},
+		".zip":  {},
 	}
 
 	return func(c *gin.Context) {
@@ -71,7 +72,7 @@ func staticHandler(root string, f gin.HandlerFunc) gin.HandlerFunc {
 			return
 		}
 
-		requestPath := strings.TrimPrefix(c.Request.URL.Path, "/static")
+		requestPath := strings.TrimPrefix(c.Request.URL.Path, root)
 		cleaned := path.Clean("/" + requestPath)
 		ext := strings.ToLower(path.Ext(cleaned))
 		if _, ok := allowedExt[ext]; !ok {
