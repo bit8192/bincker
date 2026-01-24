@@ -1,0 +1,85 @@
+<!-- 页面过度动画 -->
+<!-- 不能依赖任何其他文件和库 -->
+<!-- 只能包含<style>和<script>标签 -->
+{{ define "page_transition" }}
+<style>
+    @keyframes page-loading {
+        0% {
+            background-position-x: 1rem;
+        }
+    }
+    #page-loading {
+        display: inline-block;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #212529;
+        opacity: 1;
+        transition: opacity .4s;
+        overflow: hidden;
+    }
+    #page-loading-container{
+        width: 15%;
+        margin: calc(100vh * 0.6) auto 0;
+        color: rgb(94,95,99);
+    }
+    #page-loading-container>div{
+        text-align: center;
+    }
+    #page-loading-logo{
+        display: inline-block;
+        height: 0.8rem;
+        width: 100%;
+        background-color: rgb(60,88,125);
+        background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+        background-size: 1rem 1rem;
+        border-radius: .5rem;
+        animation: 1s linear infinite page-loading;
+    }
+</style>
+<script>
+    (function(){
+        function createElement(tagName, option, ...children){
+            const element = document.createElement(tagName);
+            if (option) {
+                for (const k of Object.keys(option)) {
+                    const v = option[k];
+                    if (v instanceof Object) {
+                        Object.assign(element[k], v)
+                    } else {
+                        element[k] = v;
+                    }
+                }
+            }
+            for (const child of children){
+                element.append(child)
+            }
+            return element
+        }
+        function createContainer(){
+            const element = createElement("div", {id: "page-loading"},
+                createElement("div", {id: "page-loading-container"},
+                    createElement("div", null,
+                        createElement("div", {id: "page-loading-logo"}),
+                        createElement("span", null, "加载中...")
+                    )
+                )
+            )
+            document.documentElement.append(element);
+            return element;
+        }
+        const loading = createContainer();
+        async function loaded() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            loading.style.opacity = "0";
+            loading.addEventListener("transitionend", ()=>{
+                loading.remove();
+            });
+            window.removeEventListener("load", loaded);
+        }
+        window.addEventListener("load",loaded);
+    })();
+</script>
+{{end}}
