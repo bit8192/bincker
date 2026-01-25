@@ -1,0 +1,170 @@
+<!-- 页面过渡动画 -->
+<!-- 不能依赖任何其他文件和库 -->
+<!-- 只能包含<style>和<script>标签 -->
+{{ define "page_transition" }}
+<style id="page-transition-style">
+  :root {
+    --pt1-ink: #10151d;
+    --pt1-ink-soft: #1a2230;
+    --pt1-paper: #f2ede3;
+    --pt1-paper-muted: rgba(242, 237, 227, 0.6);
+    --pt1-accent: #f0a24b;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  #page-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 20% 15%, rgba(240, 162, 75, 0.2), transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(125, 169, 255, 0.16), transparent 55%),
+      linear-gradient(160deg, var(--pt1-ink), var(--pt1-ink-soft));
+    opacity: 1;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+
+  #page-transition[data-state="out"] {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  #page-transition::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+    opacity: 0.2;
+    mix-blend-mode: soft-light;
+  }
+
+  .pt1-core {
+    position: relative;
+    width: min(220px, 64vw);
+    text-align: center;
+    color: var(--pt1-paper);
+    font-family: "Optima", "Palatino Linotype", "Times New Roman", serif;
+  }
+
+  .pt1-sub {
+    margin-top: 0.4rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    color: var(--pt1-paper-muted);
+  }
+
+  .pt1-line {
+    position: relative;
+    height: 2px;
+    margin: 1.2rem auto 0;
+    width: 120px;
+    background: rgba(242, 237, 227, 0.16);
+    overflow: hidden;
+  }
+
+  .pt1-line::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(240, 162, 75, 0.8), transparent);
+    animation: pt1-sweep 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pt1-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes pt1-pulse {
+    0%,
+    100% {
+      transform: translateX(-50%) scale(0.85);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateX(-50%) scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pt1-sweep {
+    from {
+      transform: translateX(-120%);
+    }
+    to {
+      transform: translateX(120%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #page-transition,
+    .pt1-spinner,
+    .pt1-dot,
+    .pt1-line::before {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+<script id="page-transition-script">
+  (function () {
+    function createElement(tagName, option, children) {
+      const element = document.createElement(tagName);
+      if (option) {
+        Object.keys(option).forEach(function (key) {
+          const value = option[key];
+          if (value && typeof value === "object") {
+            Object.assign(element[key], value);
+          } else {
+            element[key] = value;
+          }
+        });
+      }
+      if (children && children.length) {
+        children.forEach(function (child) {
+          if (child) {
+            element.append(child);
+          }
+        });
+      }
+      return element;
+    }
+
+    function buildTransition() {
+      const core = createElement("div", { className: "pt1-core" }, [
+        createElement("div", { className: "pt1-sub", textContent: "很快就好.." }),
+        createElement("div", { className: "pt1-line" }),
+      ]);
+
+      return createElement("div", { id: "page-transition" }, [core]);
+    }
+
+    const transition = buildTransition();
+    document.documentElement.append(transition);
+
+    function dismiss() {
+      transition.setAttribute("data-state", "out");
+      transition.addEventListener("transitionend", function () {
+        transition.remove();
+        const styleTag = [...document.head.childNodes].find(
+          (item) => item.id === "page-transition-style"
+        );
+        if (styleTag) styleTag.remove();
+        const scriptTag = document.getElementById("page-transition-script");
+        if (scriptTag) scriptTag.remove();
+      });
+      window.removeEventListener("load", dismiss);
+    }
+
+    window.addEventListener("load", function () {
+      setTimeout(dismiss, 500);
+    });
+  })();
+</script>
+{{ end }}
